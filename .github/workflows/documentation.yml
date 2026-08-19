@@ -1,0 +1,35 @@
+# Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
+
+# This workflow is responsible for building and publishing the documentation.
+# It is expected to run for changes to main branch after the Pipeline workflow succeeds.
+
+name: Documentation
+
+on:
+  workflow_run:
+    workflows: 
+      - "Pipeline"
+    types: 
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  documentation:
+    uses: Brent-Tunnicliff/workflow-common-apple/.github/workflows/documentation.yml@v2
+    if: >
+      ${{
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event.workflow_run &&
+          github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.head_branch == 'main'
+        )
+      }}
+    with:
+      fetch_depth: 0
+      ref: ${{ github.event.workflow_run.head_sha || github.sha }}
