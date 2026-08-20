@@ -3,33 +3,47 @@
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
 import PackageDescription
+import CompilerPluginSupport
 
 // MARK: - Package
 
 let package = Package(
-    name: "REPLACE_ME",
+    name: "public-wrapper-macro",
     platforms: [
-        .iOS(.v26),
-        .macOS(.v26),
-        .tvOS(.v26),
-        .watchOS(.v26),
-        .visionOS(.v26),
+        .iOS(.v13),
+        .macOS(.v10_15),
+        .tvOS(.v13),
+        .watchOS(.v6),
     ],
     products: [
         .library(
-            name: "REPLACE_ME",
-            targets: ["REPLACE_ME"]
+            name: "PublicWrapper",
+            targets: ["PublicWrapper"]
         )
     ],
     dependencies: [
         .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0")),
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.0.0"),
+        .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "603.0.0-latest"),
     ],
     targets: [
-        .target(name: "REPLACE_ME"),
+        .macro(
+            name: "MacroModule",
+            dependencies: [
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+            ]
+        ),
+
+        .target(
+            name: "PublicWrapper",
+            dependencies: ["MacroModule"]
+        ),
         .testTarget(
-            name: "REPLACE_METests",
-            dependencies: ["REPLACE_ME"]
+            name: "PublicWrapperTests",
+            dependencies: ["PublicWrapper"]
         ),
     ]
 )

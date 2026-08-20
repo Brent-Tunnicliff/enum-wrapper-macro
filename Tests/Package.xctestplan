@@ -9,15 +9,6 @@
     }
   ],
   "defaultOptions" : {
-    "codeCoverage" : {
-      "targets" : [
-        {
-          "containerPath" : "container:",
-          "identifier" : "REPLACE_ME",
-          "name" : "REPLACE_ME"
-        }
-      ]
-    },
     "defaultTestExecutionTimeAllowance" : 60,
     "testExecutionOrdering" : "random",
     "testTimeoutsEnabled" : true
@@ -26,8 +17,8 @@
     {
       "target" : {
         "containerPath" : "container:",
-        "identifier" : "REPLACE_METests",
-        "name" : "REPLACE_METests"
+        "identifier" : "PublicWrapperTests",
+        "name" : "PublicWrapperTests"
       }
     }
   ],
