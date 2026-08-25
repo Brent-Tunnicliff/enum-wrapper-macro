@@ -25,59 +25,28 @@ enum WrapperStructGenerator {
     ///     // Any inheritable conformances that just call `value`.
     /// }
     /// ```
-    static func generate(declaration: EnumDeclSyntax, context: some MacroExpansionContext) throws -> DeclSyntax {
-        DeclSyntax(
+    static func generate(
+        declaration: EnumDeclSyntax,
+        context: some MacroExpansionContext
+    ) -> DeclSyntax {
+        let inheritance = declaration.supportedInheritedTypes(context: context)
+
+        return DeclSyntax(
             StructDeclSyntax(
                 leadingTrivia: declaration.leadingTrivia,
                 modifiers: DeclModifierListSyntax {
-                    DeclModifierSyntax(name: .keyword(.public))
+                    .public
                 },
                 name: structName(from: declaration),
-                inheritanceClause: try declaration.inheritanceClauseWithSendable,
+                inheritanceClause: inheritance.asInheritanceClauseSyntax,
                 memberBlock: MemberBlockGenerator.generate(
                     declaration: declaration,
-                    cases: cases(of: declaration, in: context)
+                    cases: declaration.extractCases(context: context),
+                    inheritance: inheritance
                 ),
                 trailingTrivia: declaration.trailingTrivia
             )
         )
-    }
-
-    private static func cases(
-        of declaration: EnumDeclSyntax,
-        in context: some MacroExpansionContext
-    ) -> [EnumCaseElementSyntax] {
-        var cases: [EnumCaseElementSyntax] = []
-
-        for member in declaration.memberBlock.members {
-            guard let caseDecl = member.decl.as(EnumCaseDeclSyntax.self) else {
-                continue
-            }
-
-            for element in caseDecl.elements {
-                guard element.parameterClause == nil else {
-                    // This case has associated values, record an error and skip.
-                    context.diagnose(.associatedValuesNotSupported(node: element))
-                    continue
-                }
-
-                // Pass any leading trivia comments to the case elements.
-                let hasNoComments = caseDecl.leadingTrivia.pieces.filter(\.isComment).isEmpty
-
-                let leadingTrivia: Trivia
-                if hasNoComments {
-                    leadingTrivia = Trivia(pieces: [])
-                } else {
-                    leadingTrivia = Trivia(
-                        pieces: caseDecl.leadingTrivia.filter { $0.isComment || $0.isNewline }
-                    )
-                }
-
-                cases.append(element.with(\.leadingTrivia, leadingTrivia))
-            }
-        }
-
-        return cases
     }
 
     private static func structName(from declaration: EnumDeclSyntax) -> TokenSyntax {

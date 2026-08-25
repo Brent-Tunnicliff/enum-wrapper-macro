@@ -8,39 +8,55 @@ extension WrapperStructGenerator {
 }
 
 extension WrapperStructGenerator.MemberBlockGenerator {
-    private static let variableName: TokenSyntax = .identifier("value")
-    private static let variableNameSyntax = IdentifierPatternSyntax(identifier: variableName)
-    private static let variableReferenceSyntax = DeclReferenceExprSyntax(baseName: variableName)
-
     /// Generates the contents of the wrapper struct block.
-    static func generate(declaration: EnumDeclSyntax, cases: [EnumCaseElementSyntax]) -> MemberBlockSyntax {
+    static func generate(
+        declaration: EnumDeclSyntax,
+        cases: [EnumCaseElementSyntax],
+        inheritance: Inheritance
+    ) -> MemberBlockSyntax {
         let enumTypeSyntax = IdentifierTypeSyntax(name: declaration.name)
+
         return MemberBlockSyntax(
             leadingTrivia: declaration.memberBlock.leadingTrivia,
             members: MemberBlockItemListSyntax {
-                wrapperStructVariableSyntax(enumTypeSyntax: enumTypeSyntax)
-                    .with(\.trailingTrivia, .newlines(2))
-
-                wrapperStructInitSyntax(enumTypeSyntax: enumTypeSyntax)
-                    .with(\.trailingTrivia, .newline)
-
+                valueTypealias(enumTypeSyntax: enumTypeSyntax)
+                wrapperStructVariableSyntax
+                wrapperStructInitSyntax
                 wrapperStructCaseConstants(cases: cases)
+                InheritanceClauseGenerator.generate(inheritance: inheritance)
             },
             trailingTrivia: declaration.memberBlock.trailingTrivia
         )
     }
 
-    /// Generated the value property.
+    /// Generates the value property.
     ///
     /// Example:
-    /// `let value: <ENUM_NAME>`
-    private static func wrapperStructVariableSyntax(
-        enumTypeSyntax: some TypeSyntaxProtocol
-    ) -> some DeclSyntaxProtocol {
+    /// `typealias WrappedValue = <ENUM_NAME>`
+    private static func valueTypealias(enumTypeSyntax: some TypeSyntaxProtocol) -> some DeclSyntaxProtocol {
         VariableDeclSyntax(
+            bindingSpecifier: .keyword(.typealias),
+            bindings: PatternBindingListSyntax {
+                PatternBindingSyntax(
+                    pattern: .wrappedValueTypeIdentifier,
+                    initializer: InitializerClauseSyntax(
+                        value: TypeExprSyntax(type: enumTypeSyntax)
+                    )
+                )
+            }
+        )
+    }
+
+    /// Generates the value property.
+    ///
+    /// Example:
+    /// `let wrappedValue: WrappedValue`
+    private static var wrapperStructVariableSyntax: some DeclSyntaxProtocol {
+        VariableDeclSyntax(
+            leadingTrivia: .newlines(2),
             .let,
-            name: PatternSyntax(variableNameSyntax),
-            type: TypeAnnotationSyntax(type: enumTypeSyntax)
+            name: PatternSyntax(IdentifierPatternSyntax(identifier: .wrappedValue)),
+            type: TypeAnnotationSyntax(type: .wrappedValueIdentifierType)
         )
     }
 
@@ -48,21 +64,22 @@ extension WrapperStructGenerator.MemberBlockGenerator {
     ///
     /// Example:
     /// ```
-    /// private init(value: <ENUM_NAME>) {
-    ///     self.value = value
+    /// private init(wrappedValue: WrappedValue) {
+    ///     self.wrappedValue = wrappedValue
     /// }
     /// ```
-    private static func wrapperStructInitSyntax(enumTypeSyntax: some TypeSyntaxProtocol) -> some DeclSyntaxProtocol {
+    private static var wrapperStructInitSyntax: some DeclSyntaxProtocol {
         InitializerDeclSyntax(
+            leadingTrivia: .newlines(2),
             modifiers: DeclModifierListSyntax {
-                DeclModifierSyntax(name: .keyword(.private))
+                .private
             },
             signature: FunctionSignatureSyntax(
                 parameterClause: FunctionParameterClauseSyntax(
                     parameters: FunctionParameterListSyntax {
                         FunctionParameterSyntax(
-                            firstName: variableName,
-                            type: enumTypeSyntax
+                            firstName: .wrappedValue,
+                            type: .wrappedValueIdentifierType
                         )
                     }
                 )
@@ -75,18 +92,19 @@ extension WrapperStructGenerator.MemberBlockGenerator {
                                 elements: ExprListSyntax {
                                     MemberAccessExprSyntax(
                                         base: DeclReferenceExprSyntax(baseName: .keyword(.`self`)),
-                                        declName: variableReferenceSyntax
+                                        declName: .wrappedValue
                                     )
 
                                     AssignmentExprSyntax()
 
-                                    variableReferenceSyntax
+                                    DeclReferenceExprSyntax.wrappedValue
                                 }
                             )
                         )
                     )
                 )
-            }
+            },
+            trailingTrivia: .newlines(2)
         )
     }
 
@@ -98,28 +116,26 @@ extension WrapperStructGenerator.MemberBlockGenerator {
         cases.map { caseSyntax in
             VariableDeclSyntax(
                 leadingTrivia: caseSyntax.leadingTrivia,
-                modifiers: DeclModifierListSyntax {
-                    DeclModifierSyntax(name: .keyword(.public))
-                    DeclModifierSyntax(name: .keyword(.static))
-                },
+                modifiers: DeclModifierListSyntax(arrayLiteral: .public, .static),
                 .let,
                 name: PatternSyntax(stringLiteral: caseSyntax.name.text),
                 initializer: InitializerClauseSyntax(
                     value: FunctionCallExprSyntax(
                         calledExpression: DeclReferenceExprSyntax(baseName: .keyword(.Self)),
                         leftParen: .leftParenToken(),
-                        arguments: LabeledExprListSyntax([
+                        arguments: LabeledExprListSyntax {
                             LabeledExprSyntax(
-                                label: variableName,
+                                label: .wrappedValue,
                                 colon: .colonToken(),
                                 expression: MemberAccessExprSyntax(
                                     period: .periodToken(),
                                     declName: DeclReferenceExprSyntax(baseName: caseSyntax.name.trimmed)
                                 )
                             )
-                        ]),
+                        },
                         rightParen: .rightParenToken()
-                    )
+                    ),
+                    trailingTrivia: caseSyntax.trailingTrivia
                 )
             )
         }

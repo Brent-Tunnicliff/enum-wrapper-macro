@@ -17,16 +17,16 @@ struct DiagnosticMessage: SwiftDiagnostics.DiagnosticMessage {
 
     private let node: any SyntaxProtocol
 
-    private init(
+    init(
         diagnosticID: String = #function,
         message: String,
         node: some SyntaxProtocol,
-        severity: DiagnosticSeverity
+        severity: Severity
     ) {
         self.diagnosticID = MessageID(domain: "PublicWrapperMacro", id: diagnosticID.description)
         self.message = message
         self.node = node
-        self.severity = severity
+        self.severity = severity.diagnosticSeverity
     }
 
     func generateDiagnostic() -> Diagnostic {
@@ -35,19 +35,20 @@ struct DiagnosticMessage: SwiftDiagnostics.DiagnosticMessage {
 }
 
 extension DiagnosticMessage {
-    static func associatedValuesNotSupported(node: some SyntaxProtocol) -> DiagnosticMessage {
-        DiagnosticMessage(
-            message: "Enum cases with associated values are not supported.",
-            node: node,
-            severity: .error
-        )
-    }
+    // Wrapper of DiagnosticSeverity so I don't need to import SwiftDiagnostics in places that use these extensions.
+    enum Severity {
+        case error
+        case warning
+        case note
+        case remark
 
-    static func onlyEnumsSupported(node: some SyntaxProtocol) -> DiagnosticMessage {
-        DiagnosticMessage(
-            message: "Only enum types are supported.",
-            node: node,
-            severity: .error
-        )
+        fileprivate var diagnosticSeverity: DiagnosticSeverity {
+            switch self {
+            case .error: .error
+            case .warning: .warning
+            case .note: .note
+            case .remark: .remark
+            }
+        }
     }
 }

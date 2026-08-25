@@ -14,14 +14,14 @@ public struct PublicWrapperMacro: PeerMacro {
         of node: AttributeSyntax,
         providingPeersOf declaration: some DeclSyntaxProtocol,
         in context: some MacroExpansionContext
-    ) throws -> [DeclSyntax] {
+    ) -> [DeclSyntax] {
         // If the declaration is not an enum, then raise a diagnostic error and don't generate any code.
         guard let enumDeclaration = enumDeclaration(from: declaration) else {
             context.diagnose(.onlyEnumsSupported(node: declaration))
             return []
         }
 
-        return [try WrapperStructGenerator.generate(declaration: enumDeclaration, context: context)]
+        return [WrapperStructGenerator.generate(declaration: enumDeclaration, context: context)]
     }
 
     private static func enumDeclaration(from declaration: some DeclSyntaxProtocol) -> EnumDeclSyntax? {
@@ -30,5 +30,15 @@ public struct PublicWrapperMacro: PeerMacro {
         }
 
         return enumDeclaration
+    }
+}
+
+extension DiagnosticMessage {
+    fileprivate static func onlyEnumsSupported(node: some SyntaxProtocol) -> DiagnosticMessage {
+        DiagnosticMessage(
+            message: "Only enum types are supported.",
+            node: node,
+            severity: .error
+        )
     }
 }
