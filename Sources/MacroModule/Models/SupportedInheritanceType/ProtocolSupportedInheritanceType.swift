@@ -1,7 +1,7 @@
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
 /// All the protocol types we support wrapping as each one requires manually defining.
-enum ProtocolSupportedInheritanceType: String, SupportedInheritanceType {
+enum ProtocolSupportedInheritanceType: String, CaseIterable, SupportedInheritanceType {
     case caseIterable = "CaseIterable"
     case codable = "Codable"
     case comparable = "Comparable"

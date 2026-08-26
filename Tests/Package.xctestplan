@@ -17,6 +17,13 @@
     {
       "target" : {
         "containerPath" : "container:",
+        "identifier" : "MacroModuleTests",
+        "name" : "MacroModuleTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
         "identifier" : "PublicWrapperTests",
         "name" : "PublicWrapperTests"
       }

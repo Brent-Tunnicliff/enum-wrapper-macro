@@ -36,6 +36,14 @@ let package = Package(
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
             ]
         ),
+        .testTarget(
+            name: "MacroModuleTests",
+            dependencies: [
+                "MacroModule",
+                .product(name: "SwiftSyntaxMacroExpansion", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacrosGenericTestSupport", package: "swift-syntax"),
+            ]
+        ),
 
         .target(
             name: "PublicWrapper",
