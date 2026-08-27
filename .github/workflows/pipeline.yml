@@ -55,7 +55,7 @@ jobs:
       fail-fast: false
       matrix:
         platform: ["android", "wasm"]
-        swift_version: ["6.3.3"]
+        swift_version: ["6.4"]
     uses: Brent-Tunnicliff/workflow-common-apple/.github/workflows/swift.yml@v2
     name: "swift (${{ matrix.platform }})"
     with:
