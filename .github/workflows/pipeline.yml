@@ -55,7 +55,7 @@ jobs:
       fail-fast: false
       matrix:
         platform: ["android", "wasm"]
-        swift_version: ["6.4"]
+        swift_version: ["6.3.3"]
     uses: Brent-Tunnicliff/workflow-common-apple/.github/workflows/swift.yml@v2
     name: "swift (${{ matrix.platform }})"
     with:
@@ -63,8 +63,9 @@ jobs:
       generate_test_report: ${{ matrix.platform != 'wasm' }}
       runs_on: "ubuntu-latest"
       sdks: "${{ matrix.platform }}"
-      # Android requires building and deploying the tests bundle to an emulator to test, so just skipping.
-      skip_tests: ${{ matrix.platform == 'android' }}
+      # Bug: We cannot run tests for macros for platforms other than the host machine.
+      # This seems to be fixed in Swift 6.4, so try removing that when released.
+      skip_tests: true
       swift_sdk: "swift-${{ matrix.swift_version }}-RELEASE_${{ matrix.platform }}"
       swift_version: "${{ matrix.swift_version }}"
 
