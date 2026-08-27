@@ -53,9 +53,7 @@ extension EnumDeclSyntax {
 
             return Inheritance.ProtocolItem(
                 type: protocolType,
-                syntax: inheritedTypeSyntax
-                    .with(\.leadingTrivia, [])
-                    .with(\.trailingTrivia, [])
+                syntax: inheritedTypeSyntax.withoutTrivia
             )
         }
 
@@ -116,5 +114,11 @@ extension Inheritance {
                 protocols.map(\.syntax)
             }
         )
+    }
+}
+
+extension InheritedTypeSyntax {
+    fileprivate var withoutTrivia: InheritedTypeSyntax {
+        self.with(\.leadingTrivia, []).with(\.trailingTrivia, [])
     }
 }
