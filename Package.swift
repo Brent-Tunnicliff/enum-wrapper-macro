@@ -2,8 +2,8 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
-import PackageDescription
 import CompilerPluginSupport
+import PackageDescription
 
 // MARK: - Package
 

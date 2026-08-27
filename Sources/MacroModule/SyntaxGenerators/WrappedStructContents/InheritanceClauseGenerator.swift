@@ -35,7 +35,7 @@ extension RawValueSupportedInheritanceType {
     fileprivate var generateRawValueSyntax: [any DeclSyntaxProtocol] {
         [
             rawValueVariableSyntax,
-            rawValueInitSyntax
+            rawValueInitSyntax,
         ]
     }
 
@@ -181,7 +181,7 @@ extension Trivia {
         Trivia(pieces: [
             .newlines(2),
             .lineComment("// MARK: - \(text)"),
-            .newlines(2)
+            .newlines(2),
         ])
     }
 }

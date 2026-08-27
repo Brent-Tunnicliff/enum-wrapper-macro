@@ -6,7 +6,6 @@ import Testing
 struct PublicWrapperTests {
     @Test
     func wrappingBasicMacro() async throws {
-//        let wrapper = BasicEnumWrapper.one
     }
 }
 

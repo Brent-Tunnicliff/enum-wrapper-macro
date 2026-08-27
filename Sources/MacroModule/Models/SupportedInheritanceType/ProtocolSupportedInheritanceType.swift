@@ -14,7 +14,19 @@ enum ProtocolSupportedInheritanceType: String, CaseIterable, SupportedInheritanc
     case identifiable = "Identifiable"
     case sendable = "Sendable"
 
-    // Stretch goal?
+    // Stretch goals?
     // Will look into if this is simple enough or not.
-//    case strideable = "Strideable"
+    // case strideable = "Strideable"
+    // case rawRepresentable = "RawRepresentable"
+}
+
+extension ProtocolSupportedInheritanceType {
+    /// Types that we should always conform to even if the enum does not.
+    ///
+    /// These are protocols that basic enums always conform to, even if not declared.
+    static let autoProtocolInheritanceTypes: [ProtocolSupportedInheritanceType] = [
+        .equatable,
+        .hashable,
+        .sendable,
+    ]
 }

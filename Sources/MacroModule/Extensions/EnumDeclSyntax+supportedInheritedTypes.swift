@@ -34,7 +34,7 @@ extension EnumDeclSyntax {
 
         // We only want the first or nil if none, if there are more than that then something is wrong.
         guard inheritedRawValueTypes.count < 2 else {
-            context.diagnose(.tooRawValueTypes(node: self) )
+            context.diagnose(.tooRawValueTypes(node: self))
             return nil
         }
 
@@ -46,41 +46,36 @@ extension EnumDeclSyntax {
         containsRawValue: Bool,
         inheritedTypes: InheritedTypeListSyntax,
     ) -> [Inheritance.ProtocolItem] {
-        let declaredTypes: [Inheritance.ProtocolItem] = inheritedTypes
-            .compactMap { inheritedTypeSyntax in
-                guard let protocolType = ProtocolSupportedInheritanceType(inheritedTypeSyntax: inheritedTypeSyntax) else {
-                    return nil
-                }
-
-                return Inheritance.ProtocolItem(type: protocolType, syntax: inheritedTypeSyntax)
+        let declaredTypes: [Inheritance.ProtocolItem] = inheritedTypes.compactMap { inheritedTypeSyntax in
+            guard let protocolType = ProtocolSupportedInheritanceType(inheritedTypeSyntax: inheritedTypeSyntax) else {
+                return nil
             }
 
-        guard containsRawValue else {
-            return declaredTypes
+            return Inheritance.ProtocolItem(
+                type: protocolType,
+                syntax: inheritedTypeSyntax
+                    .with(\.leadingTrivia, [])
+                    .with(\.trailingTrivia, [])
+            )
         }
 
-        // The RawValues that we support can auto conform to some protocols,
-        // so we want to also cover those.
-        // Plus we always want Sendable.
-        let autoConformProtocols: [ProtocolSupportedInheritanceType] = [.sendable]
-            + RawValueSupportedInheritanceType.autoProtocolInheritanceTypes
+        return declaredTypes + autoConformProtocols(declaredTypes: declaredTypes)
+    }
 
-        let autoConformTypes: [Inheritance.ProtocolItem] = autoConformProtocols
-            .compactMap { protocolType in
-                let alreadyDeclared = declaredTypes.contains(where: { protocolType == $0.type })
-                guard !alreadyDeclared else {
-                    return nil
-                }
-
-                return Inheritance.ProtocolItem(
-                    type: protocolType,
-                    syntax: InheritedTypeSyntax(
-                        type: IdentifierTypeSyntax(name: .identifier(protocolType.rawValue))
-                    )
-                )
+    /// There are protocol types that enums always conform to when they do not have associated values.
+    private func autoConformProtocols(declaredTypes: [Inheritance.ProtocolItem]) -> [Inheritance.ProtocolItem] {
+        ProtocolSupportedInheritanceType.autoProtocolInheritanceTypes.compactMap { type in
+            guard !declaredTypes.contains(where: { $0.type == type }) else {
+                return nil
             }
 
-        return declaredTypes + autoConformTypes
+            return Inheritance.ProtocolItem(
+                type: type,
+                syntax: InheritedTypeSyntax(
+                    type: IdentifierTypeSyntax(name: .identifier(type.rawValue))
+                )
+            )
+        }
     }
 }
 
@@ -95,15 +90,16 @@ extension DiagnosticMessage {
 }
 
 extension Inheritance {
-    // We always want `Sendable` as the enum types we wrap are inherently Sendable anyway.
     fileprivate static let `default` = Inheritance(
         rawValue: nil,
-        protocols: [
+        protocols: ProtocolSupportedInheritanceType.autoProtocolInheritanceTypes.map {
             ProtocolItem(
-                type: .sendable,
-                syntax: InheritedTypeSyntax(type: .sendableProtocol)
+                type: $0,
+                syntax: InheritedTypeSyntax(
+                    type: IdentifierTypeSyntax(name: .identifier($0.rawValue))
+                )
             )
-        ]
+        }
     )
 
     private static let rawRepresentableSyntax = InheritedTypeSyntax(

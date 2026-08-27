@@ -11,6 +11,8 @@ import Testing
     private let testMacros: [String: MacroSpec] = [:]
 #endif
 
+// TODO: Error with associated value
+
 @Suite(.enabled(if: !testMacros.isEmpty, "Platform does not support running Macro tests"))
 struct PublicWrapperMacroTests {}
 
@@ -133,7 +135,7 @@ extension PublicWrapperMacroTests.SuccessArguments {
                     case two
                 }
 
-                public struct SimpleEnumWrapper: Sendable {
+                public struct SimpleEnumWrapper: Equatable, Hashable, Sendable {
                     typealias WrappedValue = SimpleEnum
 
                     let wrappedValue: WrappedValue
@@ -160,7 +162,7 @@ extension PublicWrapperMacroTests.SuccessArguments {
                     case two
                 }
 
-                public struct EnumWithSendableWrapper: Sendable {
+                public struct EnumWithSendableWrapper: Sendable, Equatable, Hashable {
                     typealias WrappedValue = EnumWithSendable
 
                     let wrappedValue: WrappedValue
@@ -208,7 +210,7 @@ extension PublicWrapperMacroTests.SuccessArguments {
                 }
 
                 // This comment is attached to the enum.
-                public struct EnumWithCommentsWrapper: Sendable {
+                public struct EnumWithCommentsWrapper: Equatable, Hashable, Sendable {
                     typealias WrappedValue = EnumWithComments
 
                     let wrappedValue: WrappedValue
@@ -269,7 +271,7 @@ extension PublicWrapperMacroTests.SuccessArguments {
                 }
 
                 /// This comment is attached to the enum.
-                public struct EnumWithDocumentationWrapper: Sendable {
+                public struct EnumWithDocumentationWrapper: Equatable, Hashable, Sendable {
                     typealias WrappedValue = EnumWithDocumentation
 
                     let wrappedValue: WrappedValue
@@ -331,7 +333,7 @@ extension PublicWrapperMacroTests {
                 case one
             }
 
-            public struct ValueWrapper: RawRepresentable, Sendable, Equatable, Hashable {
+            public struct ValueWrapper: RawRepresentable, Equatable, Hashable, Sendable {
                 typealias WrappedValue = Value
 
                 let wrappedValue: WrappedValue

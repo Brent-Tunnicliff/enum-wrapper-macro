@@ -20,10 +20,3 @@ enum RawValueSupportedInheritanceType: String, CaseIterable, SupportedInheritanc
     case uint64 = "UInt64"
     case uint128 = "UInt128"
 }
-
-extension RawValueSupportedInheritanceType {
-    static let autoProtocolInheritanceTypes: [ProtocolSupportedInheritanceType] = [
-        .equatable,
-        .hashable
-    ]
-}
