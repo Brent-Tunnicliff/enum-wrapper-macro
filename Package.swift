@@ -72,10 +72,6 @@ for target in package.targets where target.type != .plugin {
     // MARK: Swift compliler settings
 
     let commonSwiftSettings: [PackageDescription.SwiftSetting] = [
-        // Optional: Set defaultIsolation to `MainActor` if desired.
-        // Probably only useful in a UI heavy package.
-        // .defaultIsolation(MainActor.self),
-
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("InferIsolatedConformances"),
         .enableUpcomingFeature("InternalImportsByDefault"),

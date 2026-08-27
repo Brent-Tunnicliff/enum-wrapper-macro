@@ -1,5 +1,5 @@
 {
-  "originHash" : "b96606266caa8bd6751f152d0095f04eadb7efdcb7368f2a2df252f7b9b3f291",
+  "originHash" : "628d130103b94a198a563bbbc78efdadfff18cea12e1ac4261c6f3e75e0ef3bd",
   "pins" : [
     {
       "identity" : "swift-docc-plugin",
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Brent-Tunnicliff/swift-format-plugin",
       "state" : {
-        "revision" : "d2ffb7228c500d29c99047f0b285a20d6b270312",
-        "version" : "2.0.3"
+        "revision" : "a853e15581cf5cbf21f3628c4b63c64a0a9f0e42",
+        "version" : "2.0.4"
       }
     },
     {
