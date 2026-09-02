@@ -13,14 +13,16 @@ enum WrapperStructGenerator {
     /// ```
     /// /// Any documentation from the wrapped enum.
     /// public struct <ENUM_NAME>Wrapper: Sendable, <ENUM_INHERITANCES> {
-    ///     let value: <ENUM_NAME>
+    ///     typealias WrappedValue = CaseIterableEnum
     ///
-    ///     private init(value: <ENUM_NAME>) {
-    ///         self.value = value
+    ///     let wrappedValue: WrappedValue
+    ///
+    ///     private init(wrappedValue: WrappedValue) {
+    ///         self.wrappedValue = wrappedValue
     ///     }
     ///
     ///     /// Any documentation for from the wrapped enum case.
-    ///     public static let <ENUM_CASE> = <ENUM_NAME>Wrapper(value: .<ENUM_CASE>)
+    ///     public static let <ENUM_CASE> = Self.init(wrappedValue: .<ENUM_CASE>)
     ///
     ///     // Any inheritable conformances that just call `value`.
     /// }
@@ -34,9 +36,7 @@ enum WrapperStructGenerator {
         return DeclSyntax(
             StructDeclSyntax(
                 leadingTrivia: declaration.leadingTrivia,
-                modifiers: DeclModifierListSyntax {
-                    .public
-                },
+                modifiers: DeclModifierListSyntax(arrayLiteral: .public),
                 name: structName(from: declaration),
                 inheritanceClause: inheritance.asInheritanceClauseSyntax,
                 memberBlock: MemberBlockGenerator.generate(
@@ -50,6 +50,6 @@ enum WrapperStructGenerator {
     }
 
     private static func structName(from declaration: EnumDeclSyntax) -> TokenSyntax {
-        .identifier("\(declaration.name.text)\(wrapperNameSuffix)")
+        "\(declaration.name.trimmed)\(raw: wrapperNameSuffix)"
     }
 }

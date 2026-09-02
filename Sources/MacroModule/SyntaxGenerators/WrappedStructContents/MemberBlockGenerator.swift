@@ -71,9 +71,7 @@ extension WrapperStructGenerator.MemberBlockGenerator {
     private static var wrapperStructInitSyntax: some DeclSyntaxProtocol {
         InitializerDeclSyntax(
             leadingTrivia: .newlines(2),
-            modifiers: DeclModifierListSyntax {
-                .private
-            },
+            modifiers: DeclModifierListSyntax(arrayLiteral: .private),
             signature: FunctionSignatureSyntax(
                 parameterClause: FunctionParameterClauseSyntax(
                     parameters: FunctionParameterListSyntax {
@@ -111,7 +109,7 @@ extension WrapperStructGenerator.MemberBlockGenerator {
     /// Generates the constant wrappers of each case.
     ///
     /// Example:
-    /// `public static let <ENUM_CASE> = Self(value: .<ENUM_CASE>)`
+    /// `public static let <ENUM_CASE> = Self.init(wrappedValue: .<ENUM_CASE>)`
     private static func wrapperStructCaseConstants(cases: [EnumCaseElementSyntax]) -> [some DeclSyntaxProtocol] {
         cases.map { caseSyntax in
             VariableDeclSyntax(
@@ -121,7 +119,10 @@ extension WrapperStructGenerator.MemberBlockGenerator {
                 name: PatternSyntax(stringLiteral: caseSyntax.name.text),
                 initializer: InitializerClauseSyntax(
                     value: FunctionCallExprSyntax(
-                        calledExpression: DeclReferenceExprSyntax(baseName: .keyword(.Self)),
+                        calledExpression: MemberAccessExprSyntax(
+                            base: DeclReferenceExprSyntax(baseName: .keyword(.Self)),
+                            name: .keyword(.`init`)
+                        ),
                         leftParen: .leftParenToken(),
                         arguments: LabeledExprListSyntax {
                             LabeledExprSyntax(

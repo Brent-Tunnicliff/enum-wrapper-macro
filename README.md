@@ -1,5 +1,11 @@
 # public-wrapper-macro
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FBrent-Tunnicliff%2Fpublic-wrapper-macro%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/Brent-Tunnicliff/public-wrapper-macro)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FBrent-Tunnicliff%2Fpublic-wrapper-macro%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/Brent-Tunnicliff/public-wrapper-macro)
+[![Pipeline](https://github.com/Brent-Tunnicliff/public-wrapper-macro/actions/workflows/pipeline.yml/badge.svg)](https://github.com/Brent-Tunnicliff/public-wrapper-macro/actions/workflows/pipeline.yml)
+[![Documentation](https://github.com/Brent-Tunnicliff/public-wrapper-macro/actions/workflows/documentation.yml/badge.svg)](https://github.com/Brent-Tunnicliff/public-wrapper-macro/actions/workflows/documentation.yml)
+[![](https://img.shields.io/github/license/Brent-Tunnicliff/public-wrapper-macro)](https://github.com/Brent-Tunnicliff/public-wrapper-macro/blob/main/LICENSE)
+
 In Swift, enums are very useful types when we want to check against all known cases without needing to handle a default fallback.
 
 But using them publicly in a shared library has risks as adding a new case later is always technically a breaking change.

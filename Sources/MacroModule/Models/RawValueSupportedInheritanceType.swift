@@ -2,8 +2,8 @@
 
 /// Raw value inheritance we support.
 ///
-///  Only one can be inherited from.
-enum RawValueSupportedInheritanceType: String, CaseIterable, SupportedInheritanceType {
+/// Only one can be inherited from.
+enum RawValueSupportedInheritanceType: String, CaseIterable {
     case double = "Double"
     case float = "Float"
     case int = "Int"

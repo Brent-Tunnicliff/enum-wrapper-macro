@@ -24,13 +24,7 @@ extension EnumDeclSyntax {
         context: some MacroExpansionContext,
         inheritedTypes: InheritedTypeListSyntax
     ) -> Inheritance.RawValueItem? {
-        let inheritedRawValueTypes: [Inheritance.RawValueItem] = inheritedTypes.compactMap {
-            guard let rawValueType = RawValueSupportedInheritanceType(inheritedTypeSyntax: $0) else {
-                return nil
-            }
-
-            return Inheritance.RawValueItem(type: rawValueType, syntax: $0)
-        }
+        let inheritedRawValueTypes: [Inheritance.RawValueItem] = inheritedTypes.compactMap(mapRawValueItem)
 
         // We only want the first or nil if none, if there are more than that then something is wrong.
         guard inheritedRawValueTypes.count < 2 else {
@@ -41,22 +35,28 @@ extension EnumDeclSyntax {
         return inheritedRawValueTypes.first
     }
 
+    private func mapRawValueItem(inheritedTypeSyntax: InheritedTypeSyntax) -> Inheritance.RawValueItem? {
+        guard
+            let type = inheritedTypeSyntax.type.as(IdentifierTypeSyntax.self),
+            let rawValueType = RawValueSupportedInheritanceType(rawValue: type.name.text)
+        else {
+            return nil
+        }
+
+        return Inheritance.RawValueItem(
+            type: rawValueType,
+            syntax: InheritedTypeSyntax(
+                type: IdentifierTypeSyntax(name: .identifier(rawValueType.rawValue))
+            )
+        )
+    }
+
     private func supportedProtocolTypes(
         context: some MacroExpansionContext,
         containsRawValue: Bool,
         inheritedTypes: InheritedTypeListSyntax,
     ) -> [Inheritance.ProtocolItem] {
-        let declaredTypes: [Inheritance.ProtocolItem] = inheritedTypes.compactMap { inheritedTypeSyntax in
-            guard let protocolType = ProtocolSupportedInheritanceType(inheritedTypeSyntax: inheritedTypeSyntax) else {
-                return nil
-            }
-
-            return Inheritance.ProtocolItem(
-                type: protocolType,
-                syntax: inheritedTypeSyntax.withoutTrivia
-            )
-        }
-
+        let declaredTypes: [Inheritance.ProtocolItem] = inheritedTypes.compactMap(mapProtocolItem)
         return declaredTypes + autoConformProtocols(declaredTypes: declaredTypes)
     }
 
@@ -67,13 +67,130 @@ extension EnumDeclSyntax {
                 return nil
             }
 
-            return Inheritance.ProtocolItem(
-                type: type,
-                syntax: InheritedTypeSyntax(
-                    type: IdentifierTypeSyntax(name: .identifier(type.rawValue))
-                )
-            )
+            return Inheritance.ProtocolItem(type: type)
         }
+    }
+
+    private func mapProtocolItem(inheritedTypeSyntax: InheritedTypeSyntax) -> Inheritance.ProtocolItem? {
+        guard
+            let identifierTypeSyntax = inheritedTypeSyntax.type.as(IdentifierTypeSyntax.self),
+            let typeName = ProtocolSupportedInheritanceType.TypeName(rawValue: identifierTypeSyntax.name.text),
+            let type = mapProtocolItemType(from: typeName, identifierTypeSyntax: identifierTypeSyntax)
+        else {
+            return nil
+        }
+
+        return Inheritance.ProtocolItem(type: type)
+    }
+
+    private func mapProtocolItemType(
+        from typeName: ProtocolSupportedInheritanceType.TypeName,
+        identifierTypeSyntax: IdentifierTypeSyntax
+    ) -> ProtocolSupportedInheritanceType? {
+        switch typeName {
+        case .caseIterable: .caseIterable
+        case .codable: .codable
+        case .comparable: .comparable
+        case .customDebugStringConvertible: .customDebugStringConvertible
+        case .customStringConvertible: .customStringConvertible
+        case .decodable: .decodable
+        case .encodable: .encodable
+        case .equatable: .equatable
+        case .hashable: .hashable
+        case .identifiable: identifiableProtocolItemType(identifierTypeSyntax: identifierTypeSyntax)
+        case .sendable: .sendable
+        }
+    }
+
+    /// Attempts to work out the Identifiable type.
+    private func identifiableProtocolItemType(
+        identifierTypeSyntax: IdentifierTypeSyntax
+    ) -> ProtocolSupportedInheritanceType? {
+        identifiableProtocolItemTypeFromGenericArgument(identifierTypeSyntax: identifierTypeSyntax)
+            ?? identifiableProtocolItemTypeFromTypealias(identifierTypeSyntax: identifierTypeSyntax)
+            ?? identifiableProtocolItemTypeFromMemberBlockVariable(identifierTypeSyntax: identifierTypeSyntax)
+    }
+
+    // If using genericArgumentClause e.g. `Identifiable<String>`
+    private func identifiableProtocolItemTypeFromGenericArgument(
+        identifierTypeSyntax: IdentifierTypeSyntax
+    ) -> ProtocolSupportedInheritanceType? {
+        guard let argument = identifierTypeSyntax.genericArgumentClause?.arguments.first?.argument else {
+            return nil
+        }
+
+        let rawValue: String?
+        switch argument {
+        case let .expr(syntax):
+            rawValue = syntax.as(DeclReferenceExprSyntax.self)?.baseName.trimmed.text
+        case let .type(syntax):
+            rawValue = syntax.as(IdentifierTypeSyntax.self)?.trimmed.name.trimmed.text
+        }
+
+        guard let rawValue else {
+            return nil
+        }
+
+        return .identifiable(SupportedIdentifiableType(rawValue: rawValue))
+    }
+
+    // If declared as a ID type in the member body.
+    private func identifiableProtocolItemTypeFromTypealias(
+        identifierTypeSyntax: IdentifierTypeSyntax
+    ) -> ProtocolSupportedInheritanceType? {
+        let rawValue = memberBlock.members
+            .compactMap { (item: MemberBlockItemSyntax) -> String? in
+                guard
+                    let member = TypeAliasDeclSyntax(item.decl),
+                    let rawValue = member.initializer.value.as(IdentifierTypeSyntax.self)?.name,
+                    member.name.trimmed.text == "ID" else {
+                    return nil
+                }
+
+                return rawValue.trimmed.text
+            }
+            .first
+
+        guard let rawValue else {
+            return nil
+        }
+
+        return .identifiable(SupportedIdentifiableType(rawValue: rawValue))
+    }
+
+    // If declared as a variable in the member body.
+    private func identifiableProtocolItemTypeFromMemberBlockVariable(
+        identifierTypeSyntax: IdentifierTypeSyntax
+    ) -> ProtocolSupportedInheritanceType? {
+        let rawValue: String? = memberBlock.members
+            .compactMap { (item: MemberBlockItemSyntax) -> String? in
+                guard let variable = VariableDeclSyntax(item.decl) else {
+                    return nil
+                }
+
+                // Find any cases of the variable `id` with a type that is not the generic `ID`.
+                return variable.bindings
+                    .compactMap { (binding: PatternBindingSyntax) -> String? in
+                        guard
+                            binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.trimmed.text == "id",
+                            let type = binding.typeAnnotation?.type,
+                            let typeSyntax = type.as(IdentifierTypeSyntax.self)?.name.trimmed.text,
+                            typeSyntax != "ID"
+                        else {
+                            return nil
+                        }
+
+                        return typeSyntax
+                    }
+                    .first
+            }
+            .first
+
+        guard let rawValue else {
+            return nil
+        }
+
+        return .identifiable(SupportedIdentifiableType(rawValue: rawValue))
     }
 }
 
@@ -90,18 +207,11 @@ extension DiagnosticMessage {
 extension Inheritance {
     fileprivate static let `default` = Inheritance(
         rawValue: nil,
-        protocols: ProtocolSupportedInheritanceType.autoProtocolInheritanceTypes.map {
-            ProtocolItem(
-                type: $0,
-                syntax: InheritedTypeSyntax(
-                    type: IdentifierTypeSyntax(name: .identifier($0.rawValue))
-                )
-            )
-        }
+        protocols: ProtocolSupportedInheritanceType.autoProtocolInheritanceTypes.map(ProtocolItem.init(type:))
     )
 
     private static let rawRepresentableSyntax = InheritedTypeSyntax(
-        type: IdentifierTypeSyntax(name: .identifier("RawRepresentable"))
+        type: IdentifierTypeSyntax(name: "RawRepresentable")
     )
 
     var asInheritanceClauseSyntax: InheritanceClauseSyntax {
@@ -114,11 +224,5 @@ extension Inheritance {
                 protocols.map(\.syntax)
             }
         )
-    }
-}
-
-extension InheritedTypeSyntax {
-    fileprivate var withoutTrivia: InheritedTypeSyntax {
-        self.with(\.leadingTrivia, []).with(\.trailingTrivia, [])
     }
 }

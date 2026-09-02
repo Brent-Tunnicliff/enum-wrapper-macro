@@ -51,7 +51,7 @@ extension PublicWrapperMacroTests {
 extension PublicWrapperMacroTests.SuccessArguments {
     private var allProtocolsSyntax: String {
         #if canImport(MacroModule)
-            ProtocolSupportedInheritanceType.allCases.map(\.rawValue).joined(separator: ", ")
+            ProtocolSupportedInheritanceType.TypeName.allCases.map(\.rawValue).joined(separator: ", ")
         #else
             ""
         #endif
@@ -74,6 +74,10 @@ extension PublicWrapperMacroTests.SuccessArguments {
                     ///
                     /// - Warning: This is not the first case.
                     case two = 2.2
+
+                    var id: Float {
+                        rawValue
+                    }
                 }
                 """
             expectedResult = """
@@ -86,6 +90,10 @@ extension PublicWrapperMacroTests.SuccessArguments {
                     ///
                     /// - Warning: This is not the first case.
                     case two = 2.2
+
+                    var id: Float {
+                        rawValue
+                    }
                 }
 
                 /// Complex enum that conforms to all supported types.
@@ -100,24 +108,78 @@ extension PublicWrapperMacroTests.SuccessArguments {
 
 
                     /// The first case.
-                    public static let one = Self(wrappedValue: .one)
+                    public static let one = Self.init(wrappedValue: .one)
 
                     /// The second case.
                     ///
                     /// - Warning: This is not the first case.
-                    public static let two = Self(wrappedValue: .two)
+                    public static let two = Self.init(wrappedValue: .two)
 
-                    // MARK: - RawRepresentable
+                    // MARK: RawRepresentable
 
-                    public var rawValue: Float {
+                    public typealias RawValue = Float
+
+                    public var rawValue: RawValue {
                         wrappedValue.rawValue
                     }
 
-                    public init?(rawValue: Float) {
+                    public init?(rawValue: RawValue) {
                         guard let wrappedValue = WrappedValue(rawValue: rawValue) else {
                             return nil
                         }
                         self.wrappedValue = wrappedValue
+                    }
+
+                    // MARK: CaseIterable
+
+                    public static let allCases = WrappedValue.allCases.map(Self.init)
+
+                    // MARK: Decodable
+
+                    public init(from decoder: any Decoder) throws {
+                        self.wrappedValue = try WrappedValue(from: decoder)
+                    }
+
+                    // MARK: Encodable
+
+                    public func encode(to encoder: any Encoder) throws {
+                        try wrappedValue.encode(to: encoder)
+                    }
+
+                    // MARK: Comparable
+
+                    public static func < (lhs: Self, rhs: Self) -> Bool {
+                        lhs.wrappedValue < rhs.wrappedValue
+                    }
+
+                    public static func <= (lhs: Self, rhs: Self) -> Bool {
+                        lhs.wrappedValue <= rhs.wrappedValue
+                    }
+
+                    public static func >= (lhs: Self, rhs: Self) -> Bool {
+                        lhs.wrappedValue >= rhs.wrappedValue
+                    }
+
+                    public static func > (lhs: Self, rhs: Self) -> Bool {
+                        lhs.wrappedValue > rhs.wrappedValue
+                    }
+
+                    // MARK: CustomDebugStringConvertible
+
+                    public var debugDescription: String {
+                        wrappedValue.debugDescription
+                    }
+
+                    // MARK: CustomStringConvertible
+
+                    public var description: String {
+                        wrappedValue.description
+                    }
+
+                    // MARK: Identifiable
+
+                    public var id: Float {
+                        wrappedValue.id
                     }
                 }
                 """
@@ -144,8 +206,8 @@ extension PublicWrapperMacroTests.SuccessArguments {
                         self.wrappedValue = wrappedValue
                     }
 
-                    public static let one = Self(wrappedValue: .one)
-                    public static let two = Self(wrappedValue: .two)
+                    public static let one = Self.init(wrappedValue: .one)
+                    public static let two = Self.init(wrappedValue: .two)
                 }
                 """
         case .simpleWithSendable:
@@ -171,8 +233,8 @@ extension PublicWrapperMacroTests.SuccessArguments {
                         self.wrappedValue = wrappedValue
                     }
 
-                    public static let one = Self(wrappedValue: .one)
-                    public static let two = Self(wrappedValue: .two)
+                    public static let one = Self.init(wrappedValue: .one)
+                    public static let two = Self.init(wrappedValue: .two)
                 }
                 """
         case .withComments:
@@ -222,18 +284,18 @@ extension PublicWrapperMacroTests.SuccessArguments {
 
                     // This comment is attached
                     // to the case one.
-                    public static let one = Self(wrappedValue: .one)
+                    public static let one = Self.init(wrappedValue: .one)
 
                     /*
                      This comment is attached to the case two.
                      */
-                    public static let two = Self(wrappedValue: .two)
+                    public static let two = Self.init(wrappedValue: .two)
 
                     // This should apply to both.
-                    public static let three = Self(wrappedValue: .three)
+                    public static let three = Self.init(wrappedValue: .three)
 
                     // This should apply to both.
-                    public static let four = Self(wrappedValue: .four)
+                    public static let four = Self.init(wrappedValue: .four)
                 }
                 """
         case .withDocumentation:
@@ -283,18 +345,18 @@ extension PublicWrapperMacroTests.SuccessArguments {
 
                     /// This comment is attached
                     /// to the case one.
-                    public static let one = Self(wrappedValue: .one)
+                    public static let one = Self.init(wrappedValue: .one)
 
                     /**
                      This comment is attached to the case two.
                      */
-                    public static let two = Self(wrappedValue: .two)
+                    public static let two = Self.init(wrappedValue: .two)
 
                     /// This should apply to both.
-                    public static let three = Self(wrappedValue: .three)
+                    public static let three = Self.init(wrappedValue: .three)
 
                     /// This should apply to both.
-                    public static let four = Self(wrappedValue: .four)
+                    public static let four = Self.init(wrappedValue: .four)
                 }
                 """
         }
@@ -342,15 +404,17 @@ extension PublicWrapperMacroTests {
                     self.wrappedValue = wrappedValue
                 }
 
-                public static let one = Self(wrappedValue: .one)
+                public static let one = Self.init(wrappedValue: .one)
 
-                // MARK: - RawRepresentable
+                // MARK: RawRepresentable
 
-                public var rawValue: \(rawValueType) {
+                public typealias RawValue = \(rawValueType)
+
+                public var rawValue: RawValue {
                     wrappedValue.rawValue
                 }
 
-                public init?(rawValue: \(rawValueType)) {
+                public init?(rawValue: RawValue) {
                     guard let wrappedValue = WrappedValue(rawValue: rawValue) else {
                         return nil
                     }

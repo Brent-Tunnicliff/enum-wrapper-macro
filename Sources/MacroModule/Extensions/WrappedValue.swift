@@ -1,10 +1,11 @@
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
 import SwiftSyntax
+import SwiftSyntaxBuilder
 
 extension TokenSyntax {
-    static let wrappedValue: TokenSyntax = .identifier("wrappedValue")
-    static let wrappedValueType: TokenSyntax = .identifier("WrappedValue")
+    static let wrappedValue: TokenSyntax = "wrappedValue"
+    static let wrappedValueType: TokenSyntax = "WrappedValue"
 }
 
 // MARK: wrappedValue
