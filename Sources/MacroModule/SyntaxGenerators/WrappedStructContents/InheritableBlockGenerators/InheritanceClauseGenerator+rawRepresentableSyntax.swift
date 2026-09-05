@@ -128,7 +128,9 @@ extension WrapperStructGenerator.MemberBlockGenerator.InheritanceClauseGenerator
                                                             LabeledExprSyntax(
                                                                 label: "rawValue",
                                                                 colon: .colonToken(),
-                                                                expression: DeclReferenceExprSyntax(baseName: "rawValue")
+                                                                expression: DeclReferenceExprSyntax(
+                                                                    baseName: "rawValue"
+                                                                )
                                                             )
                                                         },
                                                         rightParen: .rightParenToken()

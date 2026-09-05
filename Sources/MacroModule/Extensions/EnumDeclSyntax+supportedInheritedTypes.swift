@@ -143,7 +143,8 @@ extension EnumDeclSyntax {
                 guard
                     let member = TypeAliasDeclSyntax(item.decl),
                     let rawValue = member.initializer.value.as(IdentifierTypeSyntax.self)?.name,
-                    member.name.trimmed.text == "ID" else {
+                    member.name.trimmed.text == "ID"
+                else {
                     return nil
                 }
 

@@ -47,10 +47,7 @@ extension WrapperStructGenerator.MemberBlockGenerator.InheritanceClauseGenerator
         case .equatable, .hashable, .sendable: [(protocolType, [])]
 
         // Generate Decodable and Encodable separately instead of one Codable.
-        case .codable: [
-            (.decodable, [decodableSyntax]),
-            (.encodable, [encodableSyntax]),
-        ]
+        case .codable: [(.decodable, [decodableSyntax]), (.encodable, [encodableSyntax])]
 
         case .caseIterable: [(protocolType, [caseIterableSyntax])]
         case .comparable: [(protocolType, comparableSyntax)]
