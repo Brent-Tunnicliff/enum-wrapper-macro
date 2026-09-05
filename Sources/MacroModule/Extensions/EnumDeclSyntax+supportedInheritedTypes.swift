@@ -13,7 +13,6 @@ extension EnumDeclSyntax {
 
         let rawValue = rawValueType(context: context, inheritedTypes: inheritedTypes)
         let supportedProtocolTypes = supportedProtocolTypes(
-            context: context,
             containsRawValue: rawValue != nil,
             inheritedTypes: inheritedTypes
         )
@@ -28,7 +27,7 @@ extension EnumDeclSyntax {
 
         // We only want the first or nil if none, if there are more than that then something is wrong.
         guard inheritedRawValueTypes.count < 2 else {
-            context.diagnose(.tooRawValueTypes(node: self))
+            context.diagnose(.tooManyRawValueTypes(node: self))
             return nil
         }
 
@@ -52,7 +51,6 @@ extension EnumDeclSyntax {
     }
 
     private func supportedProtocolTypes(
-        context: some MacroExpansionContext,
         containsRawValue: Bool,
         inheritedTypes: InheritedTypeListSyntax,
     ) -> [Inheritance.ProtocolItem] {
@@ -196,7 +194,7 @@ extension EnumDeclSyntax {
 }
 
 extension DiagnosticMessage {
-    fileprivate static func tooRawValueTypes(node: some SyntaxProtocol) -> DiagnosticMessage {
+    fileprivate static func tooManyRawValueTypes(node: some SyntaxProtocol) -> DiagnosticMessage {
         DiagnosticMessage(
             message: "A maximum of 1 raw value type is supported.",
             node: node,
