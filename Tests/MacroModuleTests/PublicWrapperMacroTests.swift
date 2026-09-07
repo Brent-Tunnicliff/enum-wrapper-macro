@@ -425,13 +425,6 @@ extension PublicWrapperMacroTests.SuccessArguments {
     // MARK: ProtocolSupportedInheritanceType
 
     extension PublicWrapperMacroTests {
-        static let identifiableArguments: [ProtocolSupportedInheritanceType] = {
-            let rawValueTypes: [SupportedIdentifiableType] = RawValueSupportedInheritanceType.allCases
-                .map { SupportedIdentifiableType.rawValue($0) }
-            let supportedTypes = rawValueTypes + [.uuid, .custom(name: "CustomIdentifiable")]
-            return supportedTypes.map { .identifiable($0) }
-        }()
-
         static let supportedProtocolTypeArguments: [ProtocolSupportedInheritanceType] = {
             ProtocolSupportedInheritanceType.TypeName
                 .allCases
@@ -446,7 +439,13 @@ extension PublicWrapperMacroTests.SuccessArguments {
                     case .encodable: [.encodable]
                     case .equatable: [.equatable]
                     case .hashable: [.hashable]
-                    case .identifiable: identifiableArguments
+                    case .identifiable:
+                        [
+                            .identifiable("CustomIdentifiable"),
+                            .identifiable("Int"),
+                            .identifiable("String"),
+                            .identifiable("UUID"),
+                        ]
                     case .sendable: [.sendable]
                     }
                 }
@@ -769,7 +768,7 @@ extension PublicWrapperMacroTests.SuccessArguments {
                     enum Value: Identifiable {
                         case one
 
-                        var id: \(type.rawValue) {
+                        var id: \(type) {
                             "\\(self)"
                         }
                     }
@@ -778,7 +777,7 @@ extension PublicWrapperMacroTests.SuccessArguments {
                     enum Value: Identifiable {
                         case one
 
-                        var id: \(type.rawValue) {
+                        var id: \(type) {
                             "\\(self)"
                         }
                     }
@@ -796,7 +795,7 @@ extension PublicWrapperMacroTests.SuccessArguments {
 
                         // MARK: Identifiable
 
-                        public var id: \(type.rawValue) {
+                        public var id: \(type) {
                             wrappedValue.id
                         }
                     }

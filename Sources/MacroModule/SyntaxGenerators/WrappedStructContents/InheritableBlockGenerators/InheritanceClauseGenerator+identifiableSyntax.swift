@@ -14,7 +14,7 @@ extension WrapperStructGenerator.MemberBlockGenerator.InheritanceClauseGenerator
     ///     wrappedValue.id
     /// }
     /// ```
-    static func identifiableSyntax(for supportedType: SupportedIdentifiableType) -> some DeclSyntaxProtocol {
+    static func identifiableSyntax(for supportedType: String) -> some DeclSyntaxProtocol {
         VariableDeclSyntax(
             leadingTrivia: .inheritanceLeadingTrivia(.identifiable(supportedType)),
             modifiers: DeclModifierListSyntax(arrayLiteral: .public),
@@ -23,7 +23,7 @@ extension WrapperStructGenerator.MemberBlockGenerator.InheritanceClauseGenerator
                 PatternBindingSyntax(
                     pattern: IdentifierPatternSyntax(identifier: "id"),
                     typeAnnotation: TypeAnnotationSyntax(
-                        type: IdentifierTypeSyntax(name: .identifier(supportedType.rawValue))
+                        type: IdentifierTypeSyntax(name: .identifier(supportedType))
                     ),
                     accessorBlock: AccessorBlockSyntax(
                         accessors: .getter(

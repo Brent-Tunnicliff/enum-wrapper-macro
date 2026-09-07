@@ -129,7 +129,7 @@ extension EnumDeclSyntax {
             return nil
         }
 
-        return .identifiable(SupportedIdentifiableType(rawValue: rawValue))
+        return .identifiable(rawValue)
     }
 
     // If declared as a ID type in the member body.
@@ -154,7 +154,7 @@ extension EnumDeclSyntax {
             return nil
         }
 
-        return .identifiable(SupportedIdentifiableType(rawValue: rawValue))
+        return .identifiable(rawValue)
     }
 
     // If declared as a variable in the member body.
@@ -189,7 +189,7 @@ extension EnumDeclSyntax {
             return nil
         }
 
-        return .identifiable(SupportedIdentifiableType(rawValue: rawValue))
+        return .identifiable(rawValue)
     }
 }
 

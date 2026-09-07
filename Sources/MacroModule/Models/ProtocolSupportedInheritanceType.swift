@@ -11,7 +11,7 @@ enum ProtocolSupportedInheritanceType: Hashable, Sendable {
     case encodable
     case equatable
     case hashable
-    case identifiable(SupportedIdentifiableType)
+    case identifiable(String)
     case sendable
 }
 
