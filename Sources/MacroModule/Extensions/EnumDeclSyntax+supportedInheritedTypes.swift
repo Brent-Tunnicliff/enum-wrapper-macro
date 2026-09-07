@@ -166,7 +166,8 @@ extension EnumDeclSyntax {
     private func identifiableProtocolItemType(
         identifierTypeSyntax: IdentifierTypeSyntax
     ) -> ProtocolSupportedInheritanceType? {
-        let rawValue = extractGenericTypeName(from: identifierTypeSyntax)
+        let rawValue =
+            extractGenericTypeName(from: identifierTypeSyntax)
             ?? extractTypealiasTypeName(from: identifierTypeSyntax, name: "ID")
             ?? extractVariableTypeName(from: identifierTypeSyntax, name: "id", excluding: "ID")
 
