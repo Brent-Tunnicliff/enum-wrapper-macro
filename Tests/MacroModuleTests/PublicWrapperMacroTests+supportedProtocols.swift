@@ -410,6 +410,69 @@ import Testing
 
             return (input, expectedResult)
         }
+
+        /// Unsupported protocols are ignored and don't block generating the rest of the supported wrapper.
+        @Test
+        func nonSupportedProtocolsIgnored() {
+            let input = """
+                @PublicWrapper
+                enum Value: String, ExpressibleByStringLiteral {
+                    case one
+                    case two
+                    case other
+
+                    init(stringLiteral value: StringLiteralType) {
+                        self = Self(rawValue: value) ?? .other
+                    }
+                }
+                """
+            let expectedResult = """
+                enum Value: String, ExpressibleByStringLiteral {
+                    case one
+                    case two
+                    case other
+
+                    init(stringLiteral value: StringLiteralType) {
+                        self = Self(rawValue: value) ?? .other
+                    }
+                }
+
+                public struct ValueWrapper: RawRepresentable, Equatable, Hashable, Sendable {
+                    typealias WrappedValue = Value
+
+                    let wrappedValue: WrappedValue
+
+                    private init(wrappedValue: WrappedValue) {
+                        self.wrappedValue = wrappedValue
+                    }
+
+                    public static let one = Self.init(wrappedValue: .one)
+                    public static let two = Self.init(wrappedValue: .two)
+                    public static let other = Self.init(wrappedValue: .other)
+
+                    // MARK: RawRepresentable
+
+                    public typealias RawValue = String
+
+                    public var rawValue: RawValue {
+                        wrappedValue.rawValue
+                    }
+
+                    public init?(rawValue: RawValue) {
+                        guard let wrappedValue = WrappedValue(rawValue: rawValue) else {
+                            return nil
+                        }
+                        self.wrappedValue = wrappedValue
+                    }
+                }
+                """
+            assertMacroExpansion(
+                input,
+                expandedSource: expectedResult,
+                macroSpecs: testMacros,
+                failureHandler: Issue.record(failure:)
+            )
+        }
     }
 
 #endif
