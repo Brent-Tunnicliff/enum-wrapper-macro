@@ -15,20 +15,12 @@ public struct PublicWrapperMacro: PeerMacro {
         in context: some MacroExpansionContext
     ) -> [DeclSyntax] {
         // If the declaration is not an enum, then raise a diagnostic error and don't generate any code.
-        guard let enumDeclaration = enumDeclaration(from: declaration) else {
+        guard let enumDeclaration = declaration.as(EnumDeclSyntax.self) else {
             context.diagnose(.onlyEnumsSupported(node: declaration))
             return []
         }
 
         return [WrapperStructGenerator.generate(declaration: enumDeclaration, context: context)]
-    }
-
-    private static func enumDeclaration(from declaration: some DeclSyntaxProtocol) -> EnumDeclSyntax? {
-        guard let enumDeclaration = declaration.as(EnumDeclSyntax.self) else {
-            return nil
-        }
-
-        return enumDeclaration
     }
 }
 
