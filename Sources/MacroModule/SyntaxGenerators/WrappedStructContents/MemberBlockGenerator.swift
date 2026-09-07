@@ -14,13 +14,11 @@ extension WrapperStructGenerator.MemberBlockGenerator {
         cases: [EnumCaseElementSyntax],
         inheritance: Inheritance
     ) -> MemberBlockSyntax {
-        let enumTypeSyntax = IdentifierTypeSyntax(name: declaration.name)
-
-        return MemberBlockSyntax(
+        MemberBlockSyntax(
             leadingTrivia: declaration.memberBlock.leadingTrivia,
             members: MemberBlockItemListSyntax {
-                valueTypealias(enumTypeSyntax: enumTypeSyntax)
-                wrapperStructVariableSyntax
+                valueTypealias(declaration: declaration)
+                wrapperStructVariableSyntax(declaration: declaration)
                 wrapperStructInitSyntax
                 wrapperStructCaseConstants(cases: cases)
                 InheritanceClauseGenerator.generate(inheritance: inheritance)
@@ -33,14 +31,15 @@ extension WrapperStructGenerator.MemberBlockGenerator {
     ///
     /// Example:
     /// `typealias WrappedValue = <ENUM_NAME>`
-    private static func valueTypealias(enumTypeSyntax: some TypeSyntaxProtocol) -> some DeclSyntaxProtocol {
+    private static func valueTypealias(declaration: EnumDeclSyntax) -> some DeclSyntaxProtocol {
         VariableDeclSyntax(
+            modifiers: declaration.modifiers.trimmed,
             bindingSpecifier: .keyword(.typealias),
             bindings: PatternBindingListSyntax {
                 PatternBindingSyntax(
                     pattern: .wrappedValueTypeIdentifier,
                     initializer: InitializerClauseSyntax(
-                        value: TypeExprSyntax(type: enumTypeSyntax)
+                        value: TypeExprSyntax(type: IdentifierTypeSyntax(name: declaration.name))
                     )
                 )
             }
@@ -51,9 +50,10 @@ extension WrapperStructGenerator.MemberBlockGenerator {
     ///
     /// Example:
     /// `let wrappedValue: WrappedValue`
-    private static var wrapperStructVariableSyntax: some DeclSyntaxProtocol {
+    private static func wrapperStructVariableSyntax(declaration: EnumDeclSyntax) -> some DeclSyntaxProtocol {
         VariableDeclSyntax(
             leadingTrivia: .newlines(2),
+            modifiers: declaration.modifiers.trimmed,
             .let,
             name: PatternSyntax(IdentifierPatternSyntax(identifier: .wrappedValue)),
             type: TypeAnnotationSyntax(type: .wrappedValueIdentifierType)
