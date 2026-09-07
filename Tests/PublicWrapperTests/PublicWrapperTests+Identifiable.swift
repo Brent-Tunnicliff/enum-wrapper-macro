@@ -1,0 +1,151 @@
+// Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
+
+public import Foundation
+import PublicWrapper
+import Testing
+
+extension PublicWrapperTests {
+    fileprivate func checkIdentifiableWrapsEnum<EnumType, WrapperType>(
+        enumValues: (EnumType, EnumType),
+        wrapperValues: (WrapperType, WrapperType)
+    ) where EnumType: Identifiable, WrapperType: Identifiable, EnumType.ID == WrapperType.ID {
+        // Check we didn't accidentally pass the one type in both.
+        #expect(EnumType.self != WrapperType.self)
+
+        #expect(wrapperValues.0.id == enumValues.0.id)
+        #expect(wrapperValues.0.id != enumValues.1.id)
+        #expect(wrapperValues.1.id == enumValues.1.id)
+    }
+}
+
+// MARK: String
+
+@PublicWrapper
+enum StringIdentifiableEnum: Identifiable {
+    case one
+    case two
+
+    var id: String {
+        "\(self)"
+    }
+}
+
+extension PublicWrapperTests {
+    @Test
+    func identifiableString() {
+        checkIdentifiableWrapsEnum(
+            enumValues: (StringIdentifiableEnum.one, .two),
+            wrapperValues: (StringIdentifiableEnumWrapper.one, .two)
+        )
+    }
+}
+
+// MARK: Int
+
+@PublicWrapper
+enum IntIdentifiableEnum: Identifiable {
+    case one
+    case two
+
+    var id: Int {
+        switch self {
+        case .one: 1
+        case .two: 2
+        }
+    }
+}
+
+extension PublicWrapperTests {
+    @Test
+    func identifiableInt() {
+        checkIdentifiableWrapsEnum(
+            enumValues: (IntIdentifiableEnum.one, .two),
+            wrapperValues: (IntIdentifiableEnumWrapper.one, .two)
+        )
+    }
+}
+
+// MARK: UUID
+
+/// Publicly exposing the enum to silence the false warning "Public import of 'Foundation' was not used in public declarations or inlinable code".
+///
+/// Without `public import Foundation` we get a compile error from the `UUIDIdentifiableEnumWrapper` struct.
+/// So the compiler is not able to tell if we actually need it within Macros.
+/// This will be annoying for the consumers that also have  the`InternalImportsByDefault` swift feature flag enabled.
+/// A work around could be using String as the ID type and mapping the UUID to that, but will leave that to the consumer.
+@PublicWrapper
+public enum UUIDIdentifiableEnum: Identifiable, Sendable {
+    case one
+    case two
+
+    /// The id of this enum.
+    public var id: UUID {
+        let value: UInt8
+        switch self {
+        case .one:
+            value = 1
+        case .two:
+            value = 2
+        }
+
+        return UUID(
+            uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, value)
+        )
+    }
+}
+
+extension PublicWrapperTests {
+    @Test
+    func identifiableUUID() {
+        checkIdentifiableWrapsEnum(
+            enumValues: (UUIDIdentifiableEnum.one, .two),
+            wrapperValues: (UUIDIdentifiableEnumWrapper.one, .two)
+        )
+    }
+}
+
+// MARK: Typealias
+
+@PublicWrapper
+enum TypealiasIdentifiableEnum: Identifiable {
+    case one
+    case two
+
+    typealias ID = String
+
+    var id: ID {
+        "\(self)"
+    }
+}
+
+extension PublicWrapperTests {
+    @Test
+    func identifiableTypealias() {
+        checkIdentifiableWrapsEnum(
+            enumValues: (TypealiasIdentifiableEnum.one, .two),
+            wrapperValues: (TypealiasIdentifiableEnumWrapper.one, .two)
+        )
+    }
+}
+
+// MARK: Generic
+
+@PublicWrapper
+enum GenericIdentifiableEnum: Identifiable<String> {
+    case one
+    case two
+
+    var id: ID {
+        "\(self)"
+    }
+}
+
+extension PublicWrapperTests {
+    @Test
+    func identifiableGeneric() {
+        checkIdentifiableWrapsEnum(
+            enumValues: (GenericIdentifiableEnum.one, .two),
+            wrapperValues: (GenericIdentifiableEnumWrapper.one, .two)
+        )
+    }
+}
