@@ -3,8 +3,8 @@
 import SwiftSyntax
 
 extension Trivia {
-    static func inheritanceLeadingTrivia(_ type: ProtocolSupportedInheritanceType) -> Trivia {
-        inheritanceLeadingTrivia(type.typeName.rawValue)
+    static func inheritanceLeadingTrivia(_ type: ProtocolSupportedInheritanceType.TypeName) -> Trivia {
+        inheritanceLeadingTrivia(type.rawValue)
     }
 
     static func inheritanceLeadingTrivia(_ text: String) -> Trivia {

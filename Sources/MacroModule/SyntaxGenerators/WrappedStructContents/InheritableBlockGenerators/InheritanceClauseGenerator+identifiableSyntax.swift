@@ -16,7 +16,7 @@ extension WrapperStructGenerator.MemberBlockGenerator.InheritanceClauseGenerator
     /// ```
     static func identifiableSyntax(for supportedType: String) -> some DeclSyntaxProtocol {
         VariableDeclSyntax(
-            leadingTrivia: .inheritanceLeadingTrivia(.identifiable(supportedType)),
+            leadingTrivia: .inheritanceLeadingTrivia(.identifiable),
             modifiers: DeclModifierListSyntax(arrayLiteral: .public),
             bindingSpecifier: .keyword(.var),
             bindings: PatternBindingListSyntax {

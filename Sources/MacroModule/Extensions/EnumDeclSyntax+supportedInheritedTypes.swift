@@ -100,48 +100,29 @@ extension EnumDeclSyntax {
         }
     }
 
-    /// Attempts to work out the Identifiable type.
-    private func identifiableProtocolItemType(
-        identifierTypeSyntax: IdentifierTypeSyntax
-    ) -> ProtocolSupportedInheritanceType? {
-        identifiableProtocolItemTypeFromGenericArgument(identifierTypeSyntax: identifierTypeSyntax)
-            ?? identifiableProtocolItemTypeFromTypealias(identifierTypeSyntax: identifierTypeSyntax)
-            ?? identifiableProtocolItemTypeFromMemberBlockVariable(identifierTypeSyntax: identifierTypeSyntax)
-    }
-
-    // If using genericArgumentClause e.g. `Identifiable<String>`
-    private func identifiableProtocolItemTypeFromGenericArgument(
-        identifierTypeSyntax: IdentifierTypeSyntax
-    ) -> ProtocolSupportedInheritanceType? {
+    private func extractGenericTypeName(from identifierTypeSyntax: IdentifierTypeSyntax) -> String? {
         guard let argument = identifierTypeSyntax.genericArgumentClause?.arguments.first?.argument else {
             return nil
         }
 
-        let rawValue: String?
         switch argument {
         case let .expr(syntax):
-            rawValue = syntax.as(DeclReferenceExprSyntax.self)?.baseName.trimmed.text
+            return syntax.as(DeclReferenceExprSyntax.self)?.baseName.trimmed.text
         case let .type(syntax):
-            rawValue = syntax.as(IdentifierTypeSyntax.self)?.trimmed.name.trimmed.text
+            return syntax.as(IdentifierTypeSyntax.self)?.trimmed.name.trimmed.text
         }
-
-        guard let rawValue else {
-            return nil
-        }
-
-        return .identifiable(rawValue)
     }
 
-    // If declared as a ID type in the member body.
-    private func identifiableProtocolItemTypeFromTypealias(
-        identifierTypeSyntax: IdentifierTypeSyntax
-    ) -> ProtocolSupportedInheritanceType? {
-        let rawValue = memberBlock.members
+    private func extractTypealiasTypeName(
+        from identifierTypeSyntax: IdentifierTypeSyntax,
+        name: String
+    ) -> String? {
+        memberBlock.members
             .compactMap { (item: MemberBlockItemSyntax) -> String? in
                 guard
                     let member = TypeAliasDeclSyntax(item.decl),
                     let rawValue = member.initializer.value.as(IdentifierTypeSyntax.self)?.name,
-                    member.name.trimmed.text == "ID"
+                    member.name.trimmed.text == name
                 else {
                     return nil
                 }
@@ -149,32 +130,27 @@ extension EnumDeclSyntax {
                 return rawValue.trimmed.text
             }
             .first
-
-        guard let rawValue else {
-            return nil
-        }
-
-        return .identifiable(rawValue)
     }
 
-    // If declared as a variable in the member body.
-    private func identifiableProtocolItemTypeFromMemberBlockVariable(
-        identifierTypeSyntax: IdentifierTypeSyntax
-    ) -> ProtocolSupportedInheritanceType? {
-        let rawValue: String? = memberBlock.members
+    private func extractVariableTypeName(
+        from identifierTypeSyntax: IdentifierTypeSyntax,
+        name: String,
+        excluding nameToExclude: String
+    ) -> String? {
+        memberBlock.members
             .compactMap { (item: MemberBlockItemSyntax) -> String? in
                 guard let variable = VariableDeclSyntax(item.decl) else {
                     return nil
                 }
 
-                // Find any cases of the variable `id` with a type that is not the generic `ID`.
+                // Find the first case of the variable without the excluded type.
                 return variable.bindings
                     .compactMap { (binding: PatternBindingSyntax) -> String? in
                         guard
-                            binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.trimmed.text == "id",
+                            binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.trimmed.text == name,
                             let type = binding.typeAnnotation?.type,
                             let typeSyntax = type.as(IdentifierTypeSyntax.self)?.name.trimmed.text,
-                            typeSyntax != "ID"
+                            typeSyntax != nameToExclude
                         else {
                             return nil
                         }
@@ -184,12 +160,17 @@ extension EnumDeclSyntax {
                     .first
             }
             .first
+    }
 
-        guard let rawValue else {
-            return nil
-        }
+    /// Attempts to work out the Identifiable type.
+    private func identifiableProtocolItemType(
+        identifierTypeSyntax: IdentifierTypeSyntax
+    ) -> ProtocolSupportedInheritanceType? {
+        let rawValue = extractGenericTypeName(from: identifierTypeSyntax)
+            ?? extractTypealiasTypeName(from: identifierTypeSyntax, name: "ID")
+            ?? extractVariableTypeName(from: identifierTypeSyntax, name: "id", excluding: "ID")
 
-        return .identifiable(rawValue)
+        return rawValue.map { .identifiable($0) }
     }
 }
 
