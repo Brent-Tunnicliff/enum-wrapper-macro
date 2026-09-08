@@ -220,4 +220,89 @@ extension EnumWrapperMacroTests {
             failureHandler: Issue.record(failure:)
         )
     }
+
+    @Test
+    func accessArgumentNotSupported() {
+        let input = """
+            @EnumWrapper(access: "invalid")
+            enum SimpleEnum {
+                case value
+            }
+            """
+        let expandedSource = """
+            enum SimpleEnum {
+                case value
+            }
+
+            public struct SimpleEnumWrapper: Equatable, Hashable, Sendable {
+                typealias WrappedValue = SimpleEnum
+
+                let wrappedValue: WrappedValue
+
+                private init(wrappedValue: WrappedValue) {
+                    self.wrappedValue = wrappedValue
+                }
+
+                public static let value = Self.init(wrappedValue: .value)
+            }
+            """
+
+        assertMacroExpansion(
+            input,
+            expandedSource: expandedSource,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "'access' does not support value 'invalid'. "
+                        + "supported value are 'public', 'package', 'internal', 'fileprivate', 'private'.",
+                    line: 1,
+                    column: 1
+                )
+            ],
+            macroSpecs: testMacros,
+            failureHandler: Issue.record(failure:)
+        )
+    }
+
+    @Test
+    func accessArgumentNotLiteral() {
+        let input = """
+            let access: StaticString = "package"
+            @EnumWrapper(access: access)
+            enum SimpleEnum {
+                case value
+            }
+            """
+        let expandedSource = """
+            let access: StaticString = "package"
+            enum SimpleEnum {
+                case value
+            }
+
+            public struct SimpleEnumWrapper: Equatable, Hashable, Sendable {
+                typealias WrappedValue = SimpleEnum
+
+                let wrappedValue: WrappedValue
+
+                private init(wrappedValue: WrappedValue) {
+                    self.wrappedValue = wrappedValue
+                }
+
+                public static let value = Self.init(wrappedValue: .value)
+            }
+            """
+
+        assertMacroExpansion(
+            input,
+            expandedSource: expandedSource,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "'access' is not a literal expression, passing in a runtime value is not supported.",
+                    line: 2,
+                    column: 1
+                )
+            ],
+            macroSpecs: testMacros,
+            failureHandler: Issue.record(failure:)
+        )
+    }
 }

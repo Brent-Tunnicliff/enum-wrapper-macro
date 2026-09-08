@@ -29,7 +29,8 @@ enum WrapperStructGenerator {
     /// ```
     static func generate(
         declaration: EnumDeclSyntax,
-        context: some MacroExpansionContext
+        context: some MacroExpansionContext,
+        accessLevel: TokenSyntax
     ) -> DeclSyntax {
         let inheritance = declaration.supportedInheritedTypes(context: context)
 
@@ -37,13 +38,16 @@ enum WrapperStructGenerator {
             StructDeclSyntax(
                 leadingTrivia: declaration.leadingTrivia,
                 attributes: filteredAttributes(declaration: declaration),
-                modifiers: DeclModifierListSyntax(arrayLiteral: .public),
+                modifiers: DeclModifierListSyntax(
+                    arrayLiteral: DeclModifierSyntax(name: accessLevel)
+                ),
                 name: structName(from: declaration),
                 inheritanceClause: inheritance.asInheritanceClauseSyntax,
                 memberBlock: MemberBlockGenerator.generate(
                     declaration: declaration,
                     cases: declaration.extractCases(context: context),
-                    inheritance: inheritance
+                    inheritance: inheritance,
+                    accessLevel: accessLevel
                 ),
                 trailingTrivia: declaration.trailingTrivia
             )

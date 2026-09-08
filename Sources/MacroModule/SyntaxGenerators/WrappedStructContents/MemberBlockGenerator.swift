@@ -12,7 +12,8 @@ extension WrapperStructGenerator.MemberBlockGenerator {
     static func generate(
         declaration: EnumDeclSyntax,
         cases: [EnumCaseElementSyntax],
-        inheritance: Inheritance
+        inheritance: Inheritance,
+        accessLevel: TokenSyntax
     ) -> MemberBlockSyntax {
         MemberBlockSyntax(
             leadingTrivia: declaration.memberBlock.leadingTrivia,
@@ -20,7 +21,7 @@ extension WrapperStructGenerator.MemberBlockGenerator {
                 valueTypealias(declaration: declaration)
                 wrapperStructVariableSyntax(declaration: declaration)
                 wrapperStructInitSyntax
-                wrapperStructCaseConstants(cases: cases)
+                wrapperStructCaseConstants(cases: cases, accessLevel: accessLevel)
                 InheritanceClauseGenerator.generate(inheritance: inheritance)
             },
             trailingTrivia: declaration.memberBlock.trailingTrivia
@@ -110,11 +111,16 @@ extension WrapperStructGenerator.MemberBlockGenerator {
     ///
     /// Example:
     /// `public static let <ENUM_CASE> = Self.init(wrappedValue: .<ENUM_CASE>)`
-    private static func wrapperStructCaseConstants(cases: [EnumCaseElementSyntax]) -> [some DeclSyntaxProtocol] {
+    private static func wrapperStructCaseConstants(
+        cases: [EnumCaseElementSyntax],
+        accessLevel: TokenSyntax
+    ) -> [some DeclSyntaxProtocol] {
         cases.map { caseSyntax in
             VariableDeclSyntax(
                 leadingTrivia: caseSyntax.leadingTrivia,
-                modifiers: DeclModifierListSyntax(arrayLiteral: .public, .static),
+                modifiers: DeclModifierListSyntax(
+                    arrayLiteral: DeclModifierSyntax(name: accessLevel), .static
+                ),
                 .let,
                 name: PatternSyntax(stringLiteral: caseSyntax.name.text),
                 initializer: InitializerClauseSyntax(

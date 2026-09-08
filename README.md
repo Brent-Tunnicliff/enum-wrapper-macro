@@ -14,7 +14,7 @@ Sometimes we want to have the benefits of an internal enum that we can switch ov
 
 This package aims to reduce the boilerplate by auto generating that public struct and conform to some of the same protocols that the enum does via a passthrough.
 
-Due to macro limitations, the wrapper will be generated with the same name as the enum, but with "Wrapper" as a suffix. E.g. `internal enum Token` creates `public struct TokenWrapper`.
+Due to macro limitations, the wrapper will be generated with the same name as the enum, but with "Wrapper" as a suffix. E.g. `internal enum Token` creates `public struct TokenWrapper`. 
 
 ## How to use
 
@@ -62,31 +62,40 @@ public struct ThemeWrapper: Equatable, Hashable, Sendable {
 
 ## Access modifiers
 
-The wrapper will match the access control level of `let wrappedValue: WrappedValue` with that applied to the enum it wraps.
-
-For example:
+The wrapper defaults to having a `public` access modifier, but can be overridden if desired:
 
 ```swift
-import EnumWrapper
-
-@EnumWrapper
+@EnumWrapper(access: "package")
 enum Theme {
+    case light
+    case dark
+}
+
+// which generates:
+package struct ThemeWrapper: Equatable, Hashable, Sendable {
+    // ...
+
+    package static let light = Self.init(wrappedValue: .light)
+    package static let dark = Self.init(wrappedValue: .dark)
+}
+```
+
+The wrapper will set the access level of `let wrappedValue: WrappedValue` with that applied to the enum it wraps. For example:
+
+```swift
+@EnumWrapper
+private enum Theme {
     case light
     case dark
 }
 
 // which auto generates:
 public struct ThemeWrapper: Equatable, Hashable, Sendable {
-    typealias WrappedValue = Theme
-    
-    let wrappedValue: WrappedValue
-    
-    private init(wrappedValue: WrappedValue) {
-        self.wrappedValue = wrappedValue
-    }
+    private typealias WrappedValue = Theme
 
-    public static let light = Self.init(wrappedValue: .light)
-    public static let dark = Self.init(wrappedValue: .dark)
+    private let wrappedValue: WrappedValue
+
+    // ...
 }
 ```
 
