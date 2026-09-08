@@ -173,4 +173,51 @@ extension PublicWrapperMacroTests {
             failureHandler: Issue.record(failure:)
         )
     }
+
+    // We do not support indirect cases. It is just caught by the associated values flow.
+    @Test
+    func indirectCasesNotSupported() {
+        let input = """
+            @PublicWrapper
+            enum IndirectEnum {
+                case one
+                case two
+                indirect case addition(IndirectEnum, IndirectEnum)
+            }
+            """
+        let expandedSource = """
+            enum IndirectEnum {
+                case one
+                case two
+                indirect case addition(IndirectEnum, IndirectEnum)
+            }
+
+            public struct IndirectEnumWrapper: Equatable, Hashable, Sendable {
+                typealias WrappedValue = IndirectEnum
+
+                let wrappedValue: WrappedValue
+
+                private init(wrappedValue: WrappedValue) {
+                    self.wrappedValue = wrappedValue
+                }
+
+                public static let one = Self.init(wrappedValue: .one)
+                public static let two = Self.init(wrappedValue: .two)
+            }
+            """
+
+        assertMacroExpansion(
+            input,
+            expandedSource: expandedSource,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "Enum cases with associated values are not supported.",
+                    line: 5,
+                    column: 19
+                )
+            ],
+            macroSpecs: testMacros,
+            failureHandler: Issue.record(failure:)
+        )
+    }
 }

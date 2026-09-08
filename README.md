@@ -186,7 +186,9 @@ The following protocols will always be applied whether the enum explicitly does 
 
 ## No associated types
 
-To avoid extra complexity, the decision was made to not support enum with associated values. These will throw a compile error and will need to be handled manually.   
+To avoid extra complexity, the decision was made to not support enum with associated values. These will throw a compile error and will need to be handled manually.
+
+This includes indirect enum cases.   
 
 ## Source Stability
 
