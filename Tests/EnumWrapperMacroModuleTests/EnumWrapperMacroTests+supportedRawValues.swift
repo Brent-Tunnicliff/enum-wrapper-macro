@@ -3,8 +3,8 @@
 import SwiftSyntaxMacrosGenericTestSupport
 import Testing
 
-#if canImport(MacroModule)
-    @testable import MacroModule
+#if canImport(EnumWrapperMacroModule)
+    @testable import EnumWrapperMacroModule
 
     extension EnumWrapperMacroTests {
         static let supportedRawValues: [String] = RawValueSupportedInheritanceType.allCases.map(\.rawValue)

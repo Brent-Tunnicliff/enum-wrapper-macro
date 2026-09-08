@@ -30,7 +30,7 @@ let package = Package(
     ],
     targets: [
         .macro(
-            name: "MacroModule",
+            name: "EnumWrapperMacroModule",
             dependencies: [
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
                 .product(name: "SwiftDiagnostics", package: "swift-syntax"),
@@ -39,9 +39,9 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "MacroModuleTests",
+            name: "EnumWrapperMacroModuleTests",
             dependencies: [
-                "MacroModule",
+                "EnumWrapperMacroModule",
                 .product(name: "SwiftSyntaxMacroExpansion", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxMacrosGenericTestSupport", package: "swift-syntax"),
             ]
@@ -49,7 +49,7 @@ let package = Package(
 
         .target(
             name: "EnumWrapper",
-            dependencies: ["MacroModule"]
+            dependencies: ["EnumWrapperMacroModule"]
         ),
         .testTarget(
             name: "EnumWrapperTests",

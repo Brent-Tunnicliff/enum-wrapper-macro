@@ -4,8 +4,8 @@ import SwiftSyntaxMacroExpansion
 import SwiftSyntaxMacrosGenericTestSupport
 import Testing
 
-#if canImport(MacroModule)
-    @testable import MacroModule
+#if canImport(EnumWrapperMacroModule)
+    @testable import EnumWrapperMacroModule
 #endif
 
 @Suite(.enabledIfSupportsMacroTests)
@@ -13,7 +13,7 @@ struct EnumWrapperMacroTests {
     let testMacros: [String: MacroSpec]
 
     init() {
-        #if canImport(MacroModule)
+        #if canImport(EnumWrapperMacroModule)
             self.testMacros = ["EnumWrapper": MacroSpec(type: EnumWrapperMacro.self)]
         #else
             self.testMacros = [:]
@@ -23,7 +23,7 @@ struct EnumWrapperMacroTests {
     @Test
     func successWithComplexEnum() {
         let allProtocols: String = {
-            #if canImport(MacroModule)
+            #if canImport(EnumWrapperMacroModule)
                 ProtocolSupportedInheritanceType.TypeName.allCases.map(\.rawValue).joined(separator: ", ")
             #else
                 ""

@@ -4,7 +4,7 @@ import SwiftCompilerPlugin
 import SwiftSyntaxMacros
 
 @main
-struct MacroModulePlugin: CompilerPlugin {
+struct EnumWrapperMacroModulePlugin: CompilerPlugin {
     let providingMacros: [any Macro.Type] = [
         EnumWrapperMacro.self
     ]

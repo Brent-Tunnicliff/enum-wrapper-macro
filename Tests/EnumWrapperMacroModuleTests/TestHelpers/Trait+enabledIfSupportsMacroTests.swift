@@ -8,7 +8,7 @@ extension Trait where Self == ConditionTrait {
     }
 
     private static var canImportMacroModule: Bool {
-        #if canImport(MacroModule)
+        #if canImport(EnumWrapperMacroModule)
             true
         #else
             false

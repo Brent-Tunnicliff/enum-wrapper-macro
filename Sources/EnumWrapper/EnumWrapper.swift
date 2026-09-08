@@ -31,4 +31,4 @@
 /// ```
 @attached(peer, names: suffixed(Wrapper))
 public macro EnumWrapper(access: StaticString = "public") =
-    #externalMacro(module: "MacroModule", type: "EnumWrapperMacro")
+    #externalMacro(module: "EnumWrapperMacroModule", type: "EnumWrapperMacro")
