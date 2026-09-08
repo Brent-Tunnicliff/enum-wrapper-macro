@@ -7,13 +7,13 @@ import SwiftSyntaxMacros
 enum WrapperStructGenerator {
     private static let wrapperNameSuffix = "Wrapper"
 
-    /// Generates the struct that is a wrapper of the inout enum type.
+    /// Generates the struct that is a wrapper of the input enum type.
     ///
     /// Example:
     /// ```
     /// /// Any documentation from the wrapped enum.
     /// public struct <ENUM_NAME>Wrapper: Sendable, <ENUM_INHERITANCES> {
-    ///     typealias WrappedValue = CaseIterableEnum
+    ///     typealias WrappedValue = <ENUM_NAME>
     ///
     ///     let wrappedValue: WrappedValue
     ///

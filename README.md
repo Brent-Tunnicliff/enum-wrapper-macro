@@ -18,11 +18,11 @@ Due to macro limitations, the wrapper will be generated with the same name as th
 
 ## How to use
 
-Import into you package and target as usual: 
+Import into your package and target as usual: 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/Brent-Tunnicliff/public-wrapper-macro.git", from: "1.0.0")`
+    .package(url: "https://github.com/Brent-Tunnicliff/public-wrapper-macro.git", from: "1.0.0")
 ],
 targets: [
     .target(
@@ -110,9 +110,9 @@ This package supports mapping a wide range of protocols:
 
 Any defined logic for these protocols in the wrapper just call the enum equivalent directly.
 
-If a protocol we do not support is added to the enum, it will just be ignored and the wrapper will not conform to it.
+If a protocol that we do not support is added to the enum, it will just be ignored and the wrapper will not conform to it.
 
-We only check protocol conformances of the attached enum block, if you split any out over seperate extensions then they will not be handled by the wrapper. e.g. if the enum is `@PublicWrapper enum Theme { // ...`, then you add an extension `extension Theme: CaseIterable { // ...`, then the wrapper **does not** conform to `CaseIterable`. 
+We only check protocol conformances of the attached enum block, if you split any out over separate extensions then they will not be handled by the wrapper. e.g. if the enum is `@PublicWrapper enum Theme { // ...`, then you add an extension `extension Theme: CaseIterable { // ...`, then the wrapper **does not** conform to `CaseIterable`. 
 
 ### Raw values
 
@@ -172,7 +172,7 @@ public struct DurationOptionWrapper: RawRepresentable, Equatable, Hashable, Send
 }
 ```
 
-This package **do not support** the enum conformance to RawRepresentable explicitly. That decision was made to avoid extra complexity in trying to work out the type.
+This package **does not support** the enum conformance to RawRepresentable explicitly. That decision was made to avoid extra complexity in trying to work out the type.
 
 ## Auto protocol conformance
 
