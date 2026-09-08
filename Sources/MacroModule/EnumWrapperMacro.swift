@@ -5,8 +5,8 @@ import SwiftSyntaxBuilder
 public import SwiftSyntaxMacros
 
 /// Wrapper for generating a public struct to wrap an enum.
-public struct PublicWrapperMacro: PeerMacro {
-    /// Expand a PublicWrapper macro.
+public struct EnumWrapperMacro: PeerMacro {
+    /// Expand a EnumWrapper macro.
     ///
     /// The macro expansion can introduce "peer" declarations that sit alongside the given declaration.
     public static func expansion(

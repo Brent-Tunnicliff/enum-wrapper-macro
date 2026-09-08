@@ -60,7 +60,7 @@ enum WrapperStructGenerator {
                 switch element {
                 case let .attribute(syntax):
                     // We need to filter out our own macro to avoid a loop build failure.
-                    (IdentifierTypeSyntax(syntax.attributeName)?.name.trimmed.text ?? "") != "PublicWrapper"
+                    (IdentifierTypeSyntax(syntax.attributeName)?.name.trimmed.text ?? "") != "EnumWrapper"
                 case .ifConfigDecl:
                     true
                 }

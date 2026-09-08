@@ -3,11 +3,11 @@
 import SwiftSyntaxMacrosGenericTestSupport
 import Testing
 
-extension PublicWrapperMacroTests {
+extension EnumWrapperMacroTests {
     @Test(arguments: ["actor", "class", "struct"])
     func wrappingNonEnumTypeNotSupported(type: String) {
         assertMacroExpansion(
-            "@PublicWrapper \(type) Value {}",
+            "@EnumWrapper \(type) Value {}",
             expandedSource: "\(type) Value {}",
             diagnostics: [
                 DiagnosticSpec(
@@ -24,7 +24,7 @@ extension PublicWrapperMacroTests {
     @Test
     func wrappingFunctionNotSupported() {
         assertMacroExpansion(
-            "@PublicWrapper func doTheThing() {}",
+            "@EnumWrapper func doTheThing() {}",
             expandedSource: "func doTheThing() {}",
             diagnostics: [
                 DiagnosticSpec(
@@ -41,7 +41,7 @@ extension PublicWrapperMacroTests {
     @Test
     func wrappingVariablesNotSupported() {
         assertMacroExpansion(
-            "@PublicWrapper var isEnabled: Bool",
+            "@EnumWrapper var isEnabled: Bool",
             expandedSource: "var isEnabled: Bool",
             diagnostics: [
                 DiagnosticSpec(
@@ -64,7 +64,7 @@ extension PublicWrapperMacroTests {
                 case one
             }
 
-            @PublicWrapper typealias EnumValue = Value
+            @EnumWrapper typealias EnumValue = Value
             """,
             expandedSource: """
                 enum Value {
@@ -89,7 +89,7 @@ extension PublicWrapperMacroTests {
     @Test
     func associatedValuesNotSupported() {
         let input = """
-            @PublicWrapper
+            @EnumWrapper
             enum Value {
                 case one
                 case two(String)
@@ -136,7 +136,7 @@ extension PublicWrapperMacroTests {
     @Test
     func multipleRawValuesNotSupported() {
         let input = """
-            @PublicWrapper
+            @EnumWrapper
             enum Value: String, Int {
                 case one
             }
@@ -178,7 +178,7 @@ extension PublicWrapperMacroTests {
     @Test
     func indirectCasesNotSupported() {
         let input = """
-            @PublicWrapper
+            @EnumWrapper
             enum IndirectEnum {
                 case one
                 case two

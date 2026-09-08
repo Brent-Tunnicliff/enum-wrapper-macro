@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "PublicWrapper"
-               BuildableName = "PublicWrapper"
-               BlueprintName = "PublicWrapper"
+               BlueprintIdentifier = "EnumWrapper"
+               BuildableName = "EnumWrapper"
+               BlueprintName = "EnumWrapper"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -52,15 +52,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "PublicWrapper"
-            BuildableName = "PublicWrapper"
-            BlueprintName = "PublicWrapper"
-            ReferencedContainer = "container:">
-         </BuildableReference>
-      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

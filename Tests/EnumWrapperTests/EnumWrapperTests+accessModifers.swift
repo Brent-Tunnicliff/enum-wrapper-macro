@@ -1,9 +1,9 @@
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
-import PublicWrapper
+import EnumWrapper
 import Testing
 
-extension PublicWrapperTests {
+extension EnumWrapperTests {
     /// Checks that various access levels on the enum still compile file.
     ///
     /// Does not actually assert anything, just compile time checks.
@@ -19,31 +19,31 @@ extension PublicWrapperTests {
     }
 }
 
-@PublicWrapper
+@EnumWrapper
 private enum PrivateEnum {
     case value
 }
 
 // Wrapping in an extension to avoid warning that fileprivate can just be private.
-extension PublicWrapperTests {
-    @PublicWrapper
+extension EnumWrapperTests {
+    @EnumWrapper
     fileprivate enum FileprivateEnum {
         case value
     }
 }
 
-@PublicWrapper
+@EnumWrapper
 internal enum InternalEnum {
     case value
 }
 
-@PublicWrapper
+@EnumWrapper
 package enum PackageEnum {
     case value
 }
 
 /// Not sure why anyone would want the wrapper on a public enum, but excluding it is more work than just allowing it.
-@PublicWrapper
+@EnumWrapper
 public enum PublicEnum: Sendable {
     case value
 }

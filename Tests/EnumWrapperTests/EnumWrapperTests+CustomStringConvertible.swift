@@ -1,9 +1,9 @@
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
-import PublicWrapper
+import EnumWrapper
 import Testing
 
-@PublicWrapper
+@EnumWrapper
 enum CustomStringConvertibleEnum: CustomStringConvertible {
     case value
     case otherValue
@@ -18,7 +18,7 @@ enum CustomStringConvertibleEnum: CustomStringConvertible {
     }
 }
 
-extension PublicWrapperTests {
+extension EnumWrapperTests {
     @Test
     func descriptionWrapsAsExpected() throws {
         let valueDescription = CustomStringConvertibleEnum.value.description

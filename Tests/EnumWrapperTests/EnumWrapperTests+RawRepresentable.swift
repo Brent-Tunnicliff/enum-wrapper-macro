@@ -1,21 +1,21 @@
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
-import PublicWrapper
+import EnumWrapper
 import Testing
 
-@PublicWrapper
+@EnumWrapper
 enum StringEnum: String {
     case start
     case end
 }
 
-@PublicWrapper
+@EnumWrapper
 enum IntEnum: Int {
     case zero
     case one
 }
 
-extension PublicWrapperTests {
+extension EnumWrapperTests {
     @Test
     func wrapperContainsSameRawValue() {
         #expect(StringEnumWrapper.start.rawValue == StringEnum.start.rawValue)

@@ -1,10 +1,10 @@
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import EnumWrapper
 import Foundation
-import PublicWrapper
 import Testing
 
-@PublicWrapper
+@EnumWrapper
 enum BasicEnum {
     case one
     case two
@@ -12,7 +12,7 @@ enum BasicEnum {
 
 // This file contains the basic tests that apply to all wrappers.
 // Inheritance logic is tested via extensions in seperate files.
-struct PublicWrapperTests {
+struct EnumWrapperTests {
     @Test
     func wrapperContainsSameValueAsTheEnum() {
         let cases: [(BasicEnum, BasicEnumWrapper)] = [

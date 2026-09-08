@@ -1,9 +1,9 @@
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
-import PublicWrapper
+import EnumWrapper
 import Testing
 
-@PublicWrapper
+@EnumWrapper
 enum CaseIterableEnum: CaseIterable {
     case one
     case two
@@ -12,7 +12,7 @@ enum CaseIterableEnum: CaseIterable {
     case five
 }
 
-extension PublicWrapperTests {
+extension EnumWrapperTests {
     @Test
     func wrapperAllCasesMatchesEnumOrder() {
         let enumAllCases = CaseIterableEnum.allCases

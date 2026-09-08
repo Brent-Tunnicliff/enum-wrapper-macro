@@ -6,13 +6,13 @@ import Testing
 #if canImport(MacroModule)
     @testable import MacroModule
 
-    extension PublicWrapperMacroTests {
+    extension EnumWrapperMacroTests {
         static let supportedRawValues: [String] = RawValueSupportedInheritanceType.allCases.map(\.rawValue)
 
         @Test(arguments: supportedRawValues)
         func supported(rawValue: String) {
             let input = """
-                @PublicWrapper
+                @EnumWrapper
                 enum Value: \(rawValue) {
                     case one
                 }

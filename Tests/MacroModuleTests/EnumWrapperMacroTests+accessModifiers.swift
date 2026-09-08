@@ -3,7 +3,7 @@
 import SwiftSyntaxMacrosGenericTestSupport
 import Testing
 
-extension PublicWrapperMacroTests {
+extension EnumWrapperMacroTests {
     static let accessModifierArguments = [
         "public",
         "internal",
@@ -15,7 +15,7 @@ extension PublicWrapperMacroTests {
     @Test(arguments: accessModifierArguments)
     func wrappedValueMatches(accessModifier: String) {
         let input = """
-            @PublicWrapper
+            @EnumWrapper
             \(accessModifier) enum SimpleEnum {
                 case one
                 case two

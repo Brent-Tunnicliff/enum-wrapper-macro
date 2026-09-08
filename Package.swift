@@ -8,7 +8,7 @@ import PackageDescription
 // MARK: - Package
 
 let package = Package(
-    name: "public-wrapper-macro",
+    name: "enum-wrapper-macro",
     platforms: [
         .iOS(.v13),
         .macOS(.v10_15),
@@ -17,8 +17,8 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "PublicWrapper",
-            targets: ["PublicWrapper"]
+            name: "EnumWrapper",
+            targets: ["EnumWrapper"]
         )
     ],
     dependencies: [
@@ -46,12 +46,12 @@ let package = Package(
         ),
 
         .target(
-            name: "PublicWrapper",
+            name: "EnumWrapper",
             dependencies: ["MacroModule"]
         ),
         .testTarget(
-            name: "PublicWrapperTests",
-            dependencies: ["PublicWrapper"]
+            name: "EnumWrapperTests",
+            dependencies: ["EnumWrapper"]
         ),
     ]
 )

@@ -6,6 +6,6 @@ import SwiftSyntaxMacros
 @main
 struct MacroModulePlugin: CompilerPlugin {
     let providingMacros: [any Macro.Type] = [
-        PublicWrapperMacro.self
+        EnumWrapperMacro.self
     ]
 }

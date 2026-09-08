@@ -1,10 +1,10 @@
-# public-wrapper-macro
+# enum-wrapper-macro
 
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FBrent-Tunnicliff%2Fpublic-wrapper-macro%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/Brent-Tunnicliff/public-wrapper-macro)
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FBrent-Tunnicliff%2Fpublic-wrapper-macro%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/Brent-Tunnicliff/public-wrapper-macro)
-[![Pipeline](https://github.com/Brent-Tunnicliff/public-wrapper-macro/actions/workflows/pipeline.yml/badge.svg)](https://github.com/Brent-Tunnicliff/public-wrapper-macro/actions/workflows/pipeline.yml)
-[![Documentation](https://github.com/Brent-Tunnicliff/public-wrapper-macro/actions/workflows/documentation.yml/badge.svg)](https://github.com/Brent-Tunnicliff/public-wrapper-macro/actions/workflows/documentation.yml)
-[![](https://img.shields.io/github/license/Brent-Tunnicliff/public-wrapper-macro)](https://github.com/Brent-Tunnicliff/public-wrapper-macro/blob/main/LICENSE)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FBrent-Tunnicliff%2Fenum-wrapper-macro%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/Brent-Tunnicliff/enum-wrapper-macro)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FBrent-Tunnicliff%2Fenum-wrapper-macro%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/Brent-Tunnicliff/enum-wrapper-macro)
+[![Pipeline](https://github.com/Brent-Tunnicliff/enum-wrapper-macro/actions/workflows/pipeline.yml/badge.svg)](https://github.com/Brent-Tunnicliff/enum-wrapper-macro/actions/workflows/pipeline.yml)
+[![Documentation](https://github.com/Brent-Tunnicliff/enum-wrapper-macro/actions/workflows/documentation.yml/badge.svg)](https://github.com/Brent-Tunnicliff/enum-wrapper-macro/actions/workflows/documentation.yml)
+[![](https://img.shields.io/github/license/Brent-Tunnicliff/enum-wrapper-macro)](https://github.com/Brent-Tunnicliff/enum-wrapper-macro/blob/main/LICENSE)
 
 In Swift, enums are very useful types when we want to check against all known cases without needing to handle a default fallback.
 
@@ -22,13 +22,13 @@ Import into your package and target as usual:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/Brent-Tunnicliff/public-wrapper-macro.git", from: "1.0.0")
+    .package(url: "https://github.com/Brent-Tunnicliff/enum-wrapper-macro.git", from: "1.0.0")
 ],
 targets: [
     .target(
         name: "Target",
         dependencies: [
-            .product(name: "PublicWrapper", package: "public-wrapper-macro"),
+            .product(name: "EnumWrapper", package: "enum-wrapper-macro"),
         ]
     ),
 ]
@@ -37,9 +37,9 @@ targets: [
 Then wrap an enum:
 
 ```swift
-import PublicWrapper
+import EnumWrapper
 
-@PublicWrapper
+@EnumWrapper
 enum Theme {
     case light
     case dark
@@ -67,9 +67,9 @@ The wrapper will match the access control level of `let wrappedValue: WrappedVal
 For example:
 
 ```swift
-import PublicWrapper
+import EnumWrapper
 
-@PublicWrapper
+@EnumWrapper
 enum Theme {
     case light
     case dark
@@ -112,7 +112,7 @@ Any defined logic for these protocols in the wrapper just call the enum equivale
 
 If a protocol that we do not support is added to the enum, it will just be ignored and the wrapper will not conform to it.
 
-We only check protocol conformances of the attached enum block, if you split any out over separate extensions then they will not be handled by the wrapper. e.g. if the enum is `@PublicWrapper enum Theme { // ...`, then you add an extension `extension Theme: CaseIterable { // ...`, then the wrapper **does not** conform to `CaseIterable`. 
+We only check protocol conformances of the attached enum block, if you split any out over separate extensions then they will not be handled by the wrapper. e.g. if the enum is `@EnumWrapper enum Theme { // ...`, then you add an extension `extension Theme: CaseIterable { // ...`, then the wrapper **does not** conform to `CaseIterable`. 
 
 ### Raw values
 
@@ -137,7 +137,7 @@ This package supports mapping a small list of RawValue types:
 These will only map if declared explicitly as type of the enum:
 
 ```swift
-@PublicWrapper
+@EnumWrapper
 enum DurationOption: Int { 
     case minimum = 100
     // ...

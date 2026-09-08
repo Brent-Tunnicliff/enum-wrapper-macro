@@ -9,12 +9,12 @@ import Testing
 #endif
 
 @Suite(.enabledIfSupportsMacroTests)
-struct PublicWrapperMacroTests {
+struct EnumWrapperMacroTests {
     let testMacros: [String: MacroSpec]
 
     init() {
         #if canImport(MacroModule)
-            self.testMacros = ["PublicWrapper": MacroSpec(type: PublicWrapperMacro.self)]
+            self.testMacros = ["EnumWrapper": MacroSpec(type: EnumWrapperMacro.self)]
         #else
             self.testMacros = [:]
         #endif
@@ -32,7 +32,7 @@ struct PublicWrapperMacroTests {
 
         let input = """
             /// Complex enum that conforms to all supported types.
-            @PublicWrapper
+            @EnumWrapper
             enum ComplexEnum: Float, \(allProtocols) {
                 /// The first case.
                 case one = 1.1
@@ -162,7 +162,7 @@ struct PublicWrapperMacroTests {
     @Test
     func successWithSimpleEnum() {
         let input = """
-            @PublicWrapper
+            @EnumWrapper
             enum SimpleEnum {
                 case one
                 case two
@@ -199,7 +199,7 @@ struct PublicWrapperMacroTests {
     func commentsCarryOverToWrapper() {
         let input = """
             // This comment is attached to the enum.
-            @PublicWrapper
+            @EnumWrapper
             enum EnumWithComments {
                 // This comment is attached
                 // to the case one.
@@ -269,7 +269,7 @@ struct PublicWrapperMacroTests {
     func documentationCarryOverToWrapper() {
         let input = """
             /// This comment is attached to the enum.
-            @PublicWrapper
+            @EnumWrapper
             enum EnumWithDocumentation {
                 /// This comment is attached
                 /// to the case one.
@@ -338,7 +338,7 @@ struct PublicWrapperMacroTests {
 
     func attributesCarryOverToWrapper() {
         let input = """
-            @PublicWrapper
+            @EnumWrapper
             @available(iOS 26, *)
             @available(macOS 26, *)
             enum SimpleEnum {
@@ -378,7 +378,7 @@ struct PublicWrapperMacroTests {
     @Test
     func emptyEnum() {
         let input = """
-            @PublicWrapper
+            @EnumWrapper
             enum EmptyEnum {}
             """
         let expectedResult = """
@@ -407,7 +407,7 @@ struct PublicWrapperMacroTests {
     @Test
     func caseWithBackticksWrapAsExpected() {
         let input = """
-            @PublicWrapper
+            @EnumWrapper
             enum SimpleEnum {
                 case `default`
                 case other
@@ -445,7 +445,7 @@ struct PublicWrapperMacroTests {
     func nestedInNamespaceEnumWrapperAlsoNested() {
         let input = """
             public enum Namespace {
-                @PublicWrapper
+                @EnumWrapper
                 enum SimpleEnum {
                     case value
                 }
@@ -485,7 +485,7 @@ struct PublicWrapperMacroTests {
             public enum Namespace {}
 
             extension Namespace {
-                @PublicWrapper
+                @EnumWrapper
                 enum SimpleEnum {
                     case value
                 }

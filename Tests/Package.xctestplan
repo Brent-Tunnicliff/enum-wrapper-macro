@@ -17,15 +17,15 @@
     {
       "target" : {
         "containerPath" : "container:",
-        "identifier" : "MacroModuleTests",
-        "name" : "MacroModuleTests"
+        "identifier" : "EnumWrapperTests",
+        "name" : "EnumWrapperTests"
       }
     },
     {
       "target" : {
         "containerPath" : "container:",
-        "identifier" : "PublicWrapperTests",
-        "name" : "PublicWrapperTests"
+        "identifier" : "MacroModuleTests",
+        "name" : "MacroModuleTests"
       }
     }
   ],

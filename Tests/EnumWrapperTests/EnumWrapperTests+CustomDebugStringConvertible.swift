@@ -1,9 +1,9 @@
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
-import PublicWrapper
+import EnumWrapper
 import Testing
 
-@PublicWrapper
+@EnumWrapper
 enum CustomDebugStringConvertibleEnum: CustomDebugStringConvertible {
     case value
     case otherValue
@@ -18,7 +18,7 @@ enum CustomDebugStringConvertibleEnum: CustomDebugStringConvertible {
     }
 }
 
-extension PublicWrapperTests {
+extension EnumWrapperTests {
     @Test
     func debugDescriptionWrapsAsExpected() throws {
         let valueDebugDescription = CustomDebugStringConvertibleEnum.value.debugDescription

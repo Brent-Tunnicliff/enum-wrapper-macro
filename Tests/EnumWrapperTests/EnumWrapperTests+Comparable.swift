@@ -1,9 +1,9 @@
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
-import PublicWrapper
+import EnumWrapper
 import Testing
 
-@PublicWrapper
+@EnumWrapper
 enum ComparableEnum: Comparable {
     case high
     case low
@@ -20,7 +20,7 @@ enum ComparableEnum: Comparable {
     }
 }
 
-extension PublicWrapperTests {
+extension EnumWrapperTests {
     // Comparing both the enum and the wrapper so we have a control to compare against.
     @Test
     func comparable() throws {

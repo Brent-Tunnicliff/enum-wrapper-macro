@@ -1,10 +1,10 @@
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import EnumWrapper
 public import Foundation
-import PublicWrapper
 import Testing
 
-extension PublicWrapperTests {
+extension EnumWrapperTests {
     fileprivate func checkIdentifiableWrapsEnum<EnumType, WrapperType>(
         enumValues: (EnumType, EnumType),
         wrapperValues: (WrapperType, WrapperType)
@@ -20,7 +20,7 @@ extension PublicWrapperTests {
 
 // MARK: String
 
-@PublicWrapper
+@EnumWrapper
 enum StringIdentifiableEnum: Identifiable {
     case one
     case two
@@ -30,7 +30,7 @@ enum StringIdentifiableEnum: Identifiable {
     }
 }
 
-extension PublicWrapperTests {
+extension EnumWrapperTests {
     @Test
     func identifiableString() {
         checkIdentifiableWrapsEnum(
@@ -42,7 +42,7 @@ extension PublicWrapperTests {
 
 // MARK: Int
 
-@PublicWrapper
+@EnumWrapper
 enum IntIdentifiableEnum: Identifiable {
     case one
     case two
@@ -55,7 +55,7 @@ enum IntIdentifiableEnum: Identifiable {
     }
 }
 
-extension PublicWrapperTests {
+extension EnumWrapperTests {
     @Test
     func identifiableInt() {
         checkIdentifiableWrapsEnum(
@@ -73,7 +73,7 @@ extension PublicWrapperTests {
 /// So the compiler is not able to tell if we actually need it within Macros.
 /// This will be annoying for the consumers that also have  the`InternalImportsByDefault` swift feature flag enabled.
 /// A work around could be using String as the ID type and mapping the UUID to that, but will leave that to the consumer.
-@PublicWrapper
+@EnumWrapper
 public enum UUIDIdentifiableEnum: Identifiable, Sendable {
     case one
     case two
@@ -94,7 +94,7 @@ public enum UUIDIdentifiableEnum: Identifiable, Sendable {
     }
 }
 
-extension PublicWrapperTests {
+extension EnumWrapperTests {
     @Test
     func identifiableUUID() {
         checkIdentifiableWrapsEnum(
@@ -106,7 +106,7 @@ extension PublicWrapperTests {
 
 // MARK: Typealias
 
-@PublicWrapper
+@EnumWrapper
 enum TypealiasIdentifiableEnum: Identifiable {
     case one
     case two
@@ -118,7 +118,7 @@ enum TypealiasIdentifiableEnum: Identifiable {
     }
 }
 
-extension PublicWrapperTests {
+extension EnumWrapperTests {
     @Test
     func identifiableTypealias() {
         checkIdentifiableWrapsEnum(
@@ -130,7 +130,7 @@ extension PublicWrapperTests {
 
 // MARK: Generic
 
-@PublicWrapper
+@EnumWrapper
 enum GenericIdentifiableEnum: Identifiable<String> {
     case one
     case two
@@ -140,7 +140,7 @@ enum GenericIdentifiableEnum: Identifiable<String> {
     }
 }
 
-extension PublicWrapperTests {
+extension EnumWrapperTests {
     @Test
     func identifiableGeneric() {
         checkIdentifiableWrapsEnum(

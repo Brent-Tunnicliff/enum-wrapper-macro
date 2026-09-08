@@ -23,7 +23,7 @@ struct DiagnosticMessage: SwiftDiagnostics.DiagnosticMessage {
         node: some SyntaxProtocol,
         severity: Severity
     ) {
-        self.diagnosticID = MessageID(domain: "PublicWrapperMacro", id: diagnosticID.description)
+        self.diagnosticID = MessageID(domain: "EnumWrapperMacro", id: diagnosticID.description)
         self.message = message
         self.node = node
         self.severity = severity.diagnosticSeverity

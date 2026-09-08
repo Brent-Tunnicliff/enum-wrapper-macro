@@ -1,16 +1,16 @@
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import EnumWrapper
 import Foundation
-import PublicWrapper
 import Testing
 
-@PublicWrapper
+@EnumWrapper
 enum CodableEnum: Codable {
     case one
     case two
 }
 
-extension PublicWrapperTests {
+extension EnumWrapperTests {
     @Test
     func codableWrapsTheEnumLogic() throws {
         let encoder = JSONEncoder()

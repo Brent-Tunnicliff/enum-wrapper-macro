@@ -6,7 +6,7 @@ import Testing
 #if canImport(MacroModule)
     @testable import MacroModule
 
-    extension PublicWrapperMacroTests {
+    extension EnumWrapperMacroTests {
         static let supportedProtocolTypeArguments: [ProtocolSupportedInheritanceType] = {
             ProtocolSupportedInheritanceType.TypeName
                 .allCases
@@ -53,7 +53,7 @@ import Testing
             switch protocolType {
             case .caseIterable:
                 input = """
-                    @PublicWrapper
+                    @EnumWrapper
                     enum Value: CaseIterable {
                         case one
                     }
@@ -81,7 +81,7 @@ import Testing
                     """
             case .codable:
                 input = """
-                    @PublicWrapper
+                    @EnumWrapper
                     enum Value: Codable {
                         case one
                     }
@@ -117,7 +117,7 @@ import Testing
                     """
             case .comparable:
                 input = """
-                    @PublicWrapper
+                    @EnumWrapper
                     enum Value: Comparable {
                         case one
                         case two
@@ -162,7 +162,7 @@ import Testing
                     """
             case .customDebugStringConvertible:
                 input = """
-                    @PublicWrapper
+                    @EnumWrapper
                     enum Value: CustomDebugStringConvertible {
                         case one
 
@@ -200,7 +200,7 @@ import Testing
                     """
             case .customStringConvertible:
                 input = """
-                    @PublicWrapper
+                    @EnumWrapper
                     enum Value: CustomStringConvertible {
                         case one
 
@@ -238,7 +238,7 @@ import Testing
                     """
             case .decodable:
                 input = """
-                    @PublicWrapper
+                    @EnumWrapper
                     enum Value: Decodable {
                         case one
                     }
@@ -268,7 +268,7 @@ import Testing
                     """
             case .encodable:
                 input = """
-                    @PublicWrapper
+                    @EnumWrapper
                     enum Value: Encodable {
                         case one
                     }
@@ -298,7 +298,7 @@ import Testing
                     """
             case .equatable:
                 input = """
-                    @PublicWrapper
+                    @EnumWrapper
                     enum Value: Equatable {
                         case one
                     }
@@ -322,7 +322,7 @@ import Testing
                     """
             case .hashable:
                 input = """
-                    @PublicWrapper
+                    @EnumWrapper
                     enum Value: Hashable {
                         case one
                     }
@@ -346,7 +346,7 @@ import Testing
                     """
             case let .identifiable(type):
                 input = """
-                    @PublicWrapper
+                    @EnumWrapper
                     enum Value: Identifiable {
                         case one
 
@@ -384,7 +384,7 @@ import Testing
                     """
             case .sendable:
                 input = """
-                    @PublicWrapper
+                    @EnumWrapper
                     enum Value: Sendable {
                         case one
                     }
@@ -415,7 +415,7 @@ import Testing
         @Test
         func nonSupportedProtocolsIgnored() {
             let input = """
-                @PublicWrapper
+                @EnumWrapper
                 enum Value: String, ExpressibleByStringLiteral {
                     case one
                     case two
