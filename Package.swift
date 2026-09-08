@@ -24,7 +24,9 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", from: "2.0.0"),
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.0.0"),
-        .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "603.0.0-latest"),
+
+        // Stating a range of versions for swift-syntax so we can incrementally support new major versions as they release.
+        .package(url: "https://github.com/swiftlang/swift-syntax.git", "603.0.0"..<"604.0.0"),
     ],
     targets: [
         .macro(
