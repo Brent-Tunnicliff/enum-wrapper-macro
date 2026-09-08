@@ -253,7 +253,7 @@ extension EnumWrapperMacroTests {
             diagnostics: [
                 DiagnosticSpec(
                     message: "'access' does not support value 'invalid'. "
-                        + "supported value are 'public', 'package', 'internal', 'fileprivate', 'private'.",
+                        + "Supported value are 'public', 'package', 'internal', 'fileprivate', 'private'.",
                     line: 1,
                     column: 1
                 )

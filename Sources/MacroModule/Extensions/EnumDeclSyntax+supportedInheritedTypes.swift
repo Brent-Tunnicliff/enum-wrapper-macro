@@ -12,10 +12,7 @@ extension EnumDeclSyntax {
         }
 
         let rawValue = rawValueType(context: context, inheritedTypes: inheritedTypes)
-        let supportedProtocolTypes = supportedProtocolTypes(
-            containsRawValue: rawValue != nil,
-            inheritedTypes: inheritedTypes
-        )
+        let supportedProtocolTypes = supportedProtocolTypes(inheritedTypes: inheritedTypes)
         return Inheritance(rawValue: rawValue, protocols: supportedProtocolTypes)
     }
 
@@ -50,10 +47,7 @@ extension EnumDeclSyntax {
         )
     }
 
-    private func supportedProtocolTypes(
-        containsRawValue: Bool,
-        inheritedTypes: InheritedTypeListSyntax,
-    ) -> [Inheritance.ProtocolItem] {
+    private func supportedProtocolTypes(inheritedTypes: InheritedTypeListSyntax) -> [Inheritance.ProtocolItem] {
         let declaredTypes: [Inheritance.ProtocolItem] = inheritedTypes.compactMap(mapProtocolItem)
         return declaredTypes + autoConformProtocols(declaredTypes: declaredTypes)
     }

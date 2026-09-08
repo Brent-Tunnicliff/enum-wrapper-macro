@@ -68,7 +68,9 @@ extension WrapperStructGenerator.MemberBlockGenerator.InheritanceClauseGenerator
                                     base: ExprSyntax(DeclReferenceExprSyntax(baseName: "lhs")),
                                     name: .wrappedValue
                                 ),
-                                operator: TypeExprSyntax(type: IdentifierTypeSyntax(name: token)),
+                                operator: BinaryOperatorExprSyntax(
+                                    operator: token
+                                ),
                                 rightOperand: MemberAccessExprSyntax(
                                     base: ExprSyntax(DeclReferenceExprSyntax(baseName: "rhs")),
                                     name: .wrappedValue

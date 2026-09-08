@@ -33,17 +33,10 @@ extension WrapperStructGenerator.MemberBlockGenerator {
     /// Example:
     /// `typealias WrappedValue = <ENUM_NAME>`
     private static func valueTypealias(declaration: EnumDeclSyntax) -> some DeclSyntaxProtocol {
-        VariableDeclSyntax(
+        TypeAliasDeclSyntax(
             modifiers: declaration.modifiers.trimmed,
-            bindingSpecifier: .keyword(.typealias),
-            bindings: PatternBindingListSyntax {
-                PatternBindingSyntax(
-                    pattern: .wrappedValueTypeIdentifier,
-                    initializer: InitializerClauseSyntax(
-                        value: TypeExprSyntax(type: IdentifierTypeSyntax(name: declaration.name))
-                    )
-                )
-            }
+            name: .wrappedValueType,
+            initializer: TypeInitializerClauseSyntax(value: IdentifierTypeSyntax(name: declaration.name))
         )
     }
 

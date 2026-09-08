@@ -101,7 +101,7 @@ extension DiagnosticMessage {
         DiagnosticMessage(
             message: """
                 'access' does not support value '\(input)'. \
-                supported value are \(SupportedAccess.allCases.map { "'\($0.rawValue)'" }.joined(separator: ", ")).
+                Supported value are \(SupportedAccess.allCases.map { "'\($0.rawValue)'" }.joined(separator: ", ")).
                 """,
             node: node,
             severity: .error

@@ -4,7 +4,7 @@ import EnumWrapper
 import Testing
 
 extension EnumWrapperTests {
-    /// Checks that various access levels on the enum still compile file.
+    /// Checks that various access levels on the enum still compile fine.
     ///
     /// Does not actually assert anything, just compile time checks.
     /// The macro module tests already check that the syntax passes

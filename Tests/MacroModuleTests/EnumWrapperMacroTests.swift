@@ -196,6 +196,7 @@ struct EnumWrapperMacroTests {
         )
     }
 
+    @Test
     func commentsCarryOverToWrapper() {
         let input = """
             // This comment is attached to the enum.
@@ -266,6 +267,7 @@ struct EnumWrapperMacroTests {
         )
     }
 
+    @Test
     func documentationCarryOverToWrapper() {
         let input = """
             /// This comment is attached to the enum.
@@ -336,6 +338,7 @@ struct EnumWrapperMacroTests {
         )
     }
 
+    @Test
     func attributesCarryOverToWrapper() {
         let input = """
             @EnumWrapper
@@ -351,6 +354,7 @@ struct EnumWrapperMacroTests {
             enum SimpleEnum {
                 case value
             }
+
             @available(iOS 26, *)
             @available(macOS 26, *)
             public struct SimpleEnumWrapper: Equatable, Hashable, Sendable {

@@ -1,7 +1,7 @@
 // Copyright © 2026 Brent Tunnicliff <brent@tunnicliff.dev>
 
 import EnumWrapper
-public import Foundation
+import Foundation
 import Testing
 
 extension EnumWrapperTests {
@@ -67,19 +67,19 @@ extension EnumWrapperTests {
 
 // MARK: UUID
 
-/// Publicly exposing the enum to silence the false warning "Public import of 'Foundation' was not used in public declarations or inlinable code".
+/// Setting access to internal to silence the false warning "Public import of 'Foundation' was not used in public declarations or inlinable code".
 ///
 /// Without `public import Foundation` we get a compile error from the `UUIDIdentifiableEnumWrapper` struct.
 /// So the compiler is not able to tell if we actually need it within Macros.
 /// This will be annoying for the consumers that also have  the`InternalImportsByDefault` swift feature flag enabled.
 /// A work around could be using String as the ID type and mapping the UUID to that, but will leave that to the consumer.
-@EnumWrapper
-public enum UUIDIdentifiableEnum: Identifiable, Sendable {
+@EnumWrapper(access: "internal")
+enum UUIDIdentifiableEnum: Identifiable, Sendable {
     case one
     case two
 
     /// The id of this enum.
-    public var id: UUID {
+    var id: UUID {
         let value: UInt8
         switch self {
         case .one:
