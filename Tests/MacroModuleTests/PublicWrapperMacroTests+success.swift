@@ -8,26 +8,137 @@ import Testing
 #endif
 
 extension PublicWrapperMacroTests {
-    enum SuccessArguments: CaseIterable {
-        /// Complex enum that has a raw value type and conforms to all protocols.
-        case complex
+    @Test
+    func successWithComplexEnum() {
+        let allProtocols: String = {
+            #if canImport(MacroModule)
+                ProtocolSupportedInheritanceType.TypeName.allCases.map(\.rawValue).joined(separator: ", ")
+            #else
+                ""
+            #endif
+        }()
 
-        /// Simple enum with no conformances adds Sendable conformance.
-        case simple
+        let input = """
+            /// Complex enum that conforms to all supported types.
+            @PublicWrapper
+            enum ComplexEnum: Float, \(allProtocols) {
+                /// The first case.
+                case one = 1.1
 
-        /// We expect explicit Sendable conformance to end up with the same wrapper as `basic`.
-        case simpleWithSendable
+                /// The second case.
+                ///
+                /// - Warning: This is not the first case.
+                case two = 2.2
 
-        /// We expect comments attached to enum and the cases to be included.
-        case withComments
+                var id: Float {
+                    rawValue
+                }
+            }
+            """
+        let expectedResult = """
+            /// Complex enum that conforms to all supported types.
+            enum ComplexEnum: Float, \(allProtocols) {
+                /// The first case.
+                case one = 1.1
 
-        /// We expect documentation attached to enum and the cases to be included.
-        case withDocumentation
-    }
+                /// The second case.
+                ///
+                /// - Warning: This is not the first case.
+                case two = 2.2
 
-    @Test(arguments: SuccessArguments.allCases)
-    func success(_ argument: SuccessArguments) {
-        let (input, expectedResult) = argument.values
+                var id: Float {
+                    rawValue
+                }
+            }
+
+            /// Complex enum that conforms to all supported types.
+            public struct ComplexEnumWrapper: RawRepresentable, \(allProtocols) {
+                typealias WrappedValue = ComplexEnum
+
+                let wrappedValue: WrappedValue
+
+                private init(wrappedValue: WrappedValue) {
+                    self.wrappedValue = wrappedValue
+                }
+
+
+                /// The first case.
+                public static let one = Self.init(wrappedValue: .one)
+
+                /// The second case.
+                ///
+                /// - Warning: This is not the first case.
+                public static let two = Self.init(wrappedValue: .two)
+
+                // MARK: RawRepresentable
+
+                public typealias RawValue = Float
+
+                public var rawValue: RawValue {
+                    wrappedValue.rawValue
+                }
+
+                public init?(rawValue: RawValue) {
+                    guard let wrappedValue = WrappedValue(rawValue: rawValue) else {
+                        return nil
+                    }
+                    self.wrappedValue = wrappedValue
+                }
+
+                // MARK: CaseIterable
+
+                public static let allCases = WrappedValue.allCases.map(Self.init)
+
+                // MARK: Decodable
+
+                public init(from decoder: any Decoder) throws {
+                    self.wrappedValue = try WrappedValue(from: decoder)
+                }
+
+                // MARK: Encodable
+
+                public func encode(to encoder: any Encoder) throws {
+                    try wrappedValue.encode(to: encoder)
+                }
+
+                // MARK: Comparable
+
+                public static func < (lhs: Self, rhs: Self) -> Bool {
+                    lhs.wrappedValue < rhs.wrappedValue
+                }
+
+                public static func <= (lhs: Self, rhs: Self) -> Bool {
+                    lhs.wrappedValue <= rhs.wrappedValue
+                }
+
+                public static func >= (lhs: Self, rhs: Self) -> Bool {
+                    lhs.wrappedValue >= rhs.wrappedValue
+                }
+
+                public static func > (lhs: Self, rhs: Self) -> Bool {
+                    lhs.wrappedValue > rhs.wrappedValue
+                }
+
+                // MARK: CustomDebugStringConvertible
+
+                public var debugDescription: String {
+                    wrappedValue.debugDescription
+                }
+
+                // MARK: CustomStringConvertible
+
+                public var description: String {
+                    wrappedValue.description
+                }
+
+                // MARK: Identifiable
+
+                public var id: Float {
+                    wrappedValue.id
+                }
+            }
+            """
+
         assertMacroExpansion(
             input,
             expandedSource: expectedResult,
@@ -35,321 +146,219 @@ extension PublicWrapperMacroTests {
             failureHandler: Issue.record(failure:)
         )
     }
-}
 
-extension PublicWrapperMacroTests.SuccessArguments {
-    private var allProtocolsSyntax: String {
-        #if canImport(MacroModule)
-            ProtocolSupportedInheritanceType.TypeName.allCases.map(\.rawValue).joined(separator: ", ")
-        #else
-            ""
-        #endif
+    @Test
+    func successWithSimpleEnum() {
+        let input = """
+            @PublicWrapper
+            enum SimpleEnum {
+                case one
+                case two
+            }
+            """
+        let expectedResult = """
+            enum SimpleEnum {
+                case one
+                case two
+            }
+
+            public struct SimpleEnumWrapper: Equatable, Hashable, Sendable {
+                typealias WrappedValue = SimpleEnum
+
+                let wrappedValue: WrappedValue
+
+                private init(wrappedValue: WrappedValue) {
+                    self.wrappedValue = wrappedValue
+                }
+
+                public static let one = Self.init(wrappedValue: .one)
+                public static let two = Self.init(wrappedValue: .two)
+            }
+            """
+
+        assertMacroExpansion(
+            input,
+            expandedSource: expectedResult,
+            macroSpecs: testMacros,
+            failureHandler: Issue.record(failure:)
+        )
     }
 
-    fileprivate var values: (input: String, expectedResult: String) {
-        let input: String
-        let expectedResult: String
-        switch self {
-        case .complex:
-            let allProtocols = allProtocolsSyntax
-            input = """
-                /// Complex enum that conforms to all supported types.
-                @PublicWrapper
-                enum ComplexEnum: Float, \(allProtocols) {
-                    /// The first case.
-                    case one = 1.1
+    func commentsCarryOverToWrapper() {
+        let input = """
+            // This comment is attached to the enum.
+            @PublicWrapper
+            enum EnumWithComments {
+                // This comment is attached
+                // to the case one.
+                case one
 
-                    /// The second case.
-                    ///
-                    /// - Warning: This is not the first case.
-                    case two = 2.2
+                /*
+                 This comment is attached to the case two.
+                 */
+                case two
 
-                    var id: Float {
-                        rawValue
-                    }
-                }
-                """
-            expectedResult = """
-                /// Complex enum that conforms to all supported types.
-                enum ComplexEnum: Float, \(allProtocols) {
-                    /// The first case.
-                    case one = 1.1
+                // This should apply to both.
+                case three, four
+            }
+            """
+        let expectedResult = """
+            // This comment is attached to the enum.
+            enum EnumWithComments {
+                // This comment is attached
+                // to the case one.
+                case one
 
-                    /// The second case.
-                    ///
-                    /// - Warning: This is not the first case.
-                    case two = 2.2
+                /*
+                 This comment is attached to the case two.
+                 */
+                case two
 
-                    var id: Float {
-                        rawValue
-                    }
-                }
+                // This should apply to both.
+                case three, four
+            }
 
-                /// Complex enum that conforms to all supported types.
-                public struct ComplexEnumWrapper: RawRepresentable, \(allProtocols) {
-                    typealias WrappedValue = ComplexEnum
+            // This comment is attached to the enum.
+            public struct EnumWithCommentsWrapper: Equatable, Hashable, Sendable {
+                typealias WrappedValue = EnumWithComments
 
-                    let wrappedValue: WrappedValue
+                let wrappedValue: WrappedValue
 
-                    private init(wrappedValue: WrappedValue) {
-                        self.wrappedValue = wrappedValue
-                    }
-
-
-                    /// The first case.
-                    public static let one = Self.init(wrappedValue: .one)
-
-                    /// The second case.
-                    ///
-                    /// - Warning: This is not the first case.
-                    public static let two = Self.init(wrappedValue: .two)
-
-                    // MARK: RawRepresentable
-
-                    public typealias RawValue = Float
-
-                    public var rawValue: RawValue {
-                        wrappedValue.rawValue
-                    }
-
-                    public init?(rawValue: RawValue) {
-                        guard let wrappedValue = WrappedValue(rawValue: rawValue) else {
-                            return nil
-                        }
-                        self.wrappedValue = wrappedValue
-                    }
-
-                    // MARK: CaseIterable
-
-                    public static let allCases = WrappedValue.allCases.map(Self.init)
-
-                    // MARK: Decodable
-
-                    public init(from decoder: any Decoder) throws {
-                        self.wrappedValue = try WrappedValue(from: decoder)
-                    }
-
-                    // MARK: Encodable
-
-                    public func encode(to encoder: any Encoder) throws {
-                        try wrappedValue.encode(to: encoder)
-                    }
-
-                    // MARK: Comparable
-
-                    public static func < (lhs: Self, rhs: Self) -> Bool {
-                        lhs.wrappedValue < rhs.wrappedValue
-                    }
-
-                    public static func <= (lhs: Self, rhs: Self) -> Bool {
-                        lhs.wrappedValue <= rhs.wrappedValue
-                    }
-
-                    public static func >= (lhs: Self, rhs: Self) -> Bool {
-                        lhs.wrappedValue >= rhs.wrappedValue
-                    }
-
-                    public static func > (lhs: Self, rhs: Self) -> Bool {
-                        lhs.wrappedValue > rhs.wrappedValue
-                    }
-
-                    // MARK: CustomDebugStringConvertible
-
-                    public var debugDescription: String {
-                        wrappedValue.debugDescription
-                    }
-
-                    // MARK: CustomStringConvertible
-
-                    public var description: String {
-                        wrappedValue.description
-                    }
-
-                    // MARK: Identifiable
-
-                    public var id: Float {
-                        wrappedValue.id
-                    }
-                }
-                """
-        case .simple:
-            input = """
-                @PublicWrapper
-                enum SimpleEnum {
-                    case one
-                    case two
-                }
-                """
-            expectedResult = """
-                enum SimpleEnum {
-                    case one
-                    case two
+                private init(wrappedValue: WrappedValue) {
+                    self.wrappedValue = wrappedValue
                 }
 
-                public struct SimpleEnumWrapper: Equatable, Hashable, Sendable {
-                    typealias WrappedValue = SimpleEnum
 
-                    let wrappedValue: WrappedValue
+                // This comment is attached
+                // to the case one.
+                public static let one = Self.init(wrappedValue: .one)
 
-                    private init(wrappedValue: WrappedValue) {
-                        self.wrappedValue = wrappedValue
-                    }
+                /*
+                 This comment is attached to the case two.
+                 */
+                public static let two = Self.init(wrappedValue: .two)
 
-                    public static let one = Self.init(wrappedValue: .one)
-                    public static let two = Self.init(wrappedValue: .two)
-                }
-                """
-        case .simpleWithSendable:
-            input = """
-                @PublicWrapper
-                enum EnumWithSendable: Sendable {
-                    case one
-                    case two
-                }
-                """
-            expectedResult = """
-                enum EnumWithSendable: Sendable {
-                    case one
-                    case two
-                }
+                // This should apply to both.
+                public static let three = Self.init(wrappedValue: .three)
 
-                public struct EnumWithSendableWrapper: Sendable, Equatable, Hashable {
-                    typealias WrappedValue = EnumWithSendable
+                // This should apply to both.
+                public static let four = Self.init(wrappedValue: .four)
+            }
+            """
 
-                    let wrappedValue: WrappedValue
+        assertMacroExpansion(
+            input,
+            expandedSource: expectedResult,
+            macroSpecs: testMacros,
+            failureHandler: Issue.record(failure:)
+        )
+    }
 
-                    private init(wrappedValue: WrappedValue) {
-                        self.wrappedValue = wrappedValue
-                    }
+    func documentationCarryOverToWrapper() {
+        let input = """
+            /// This comment is attached to the enum.
+            @PublicWrapper
+            enum EnumWithDocumentation {
+                /// This comment is attached
+                /// to the case one.
+                case one
 
-                    public static let one = Self.init(wrappedValue: .one)
-                    public static let two = Self.init(wrappedValue: .two)
-                }
-                """
-        case .withComments:
-            input = """
-                // This comment is attached to the enum.
-                @PublicWrapper
-                enum EnumWithComments {
-                    // This comment is attached
-                    // to the case one.
-                    case one
+                /**
+                 This comment is attached to the case two.
+                 */
+                case two
 
-                    /*
-                     This comment is attached to the case two.
-                     */
-                    case two
+                /// This should apply to both.
+                case three, four
+            }
+            """
+        let expectedResult = """
+            /// This comment is attached to the enum.
+            enum EnumWithDocumentation {
+                /// This comment is attached
+                /// to the case one.
+                case one
 
-                    // This should apply to both.
-                    case three, four
-                }
-                """
-            expectedResult = """
-                // This comment is attached to the enum.
-                enum EnumWithComments {
-                    // This comment is attached
-                    // to the case one.
-                    case one
+                /**
+                 This comment is attached to the case two.
+                 */
+                case two
 
-                    /*
-                     This comment is attached to the case two.
-                     */
-                    case two
+                /// This should apply to both.
+                case three, four
+            }
 
-                    // This should apply to both.
-                    case three, four
+            /// This comment is attached to the enum.
+            public struct EnumWithDocumentationWrapper: Equatable, Hashable, Sendable {
+                typealias WrappedValue = EnumWithDocumentation
+
+                let wrappedValue: WrappedValue
+
+                private init(wrappedValue: WrappedValue) {
+                    self.wrappedValue = wrappedValue
                 }
 
-                // This comment is attached to the enum.
-                public struct EnumWithCommentsWrapper: Equatable, Hashable, Sendable {
-                    typealias WrappedValue = EnumWithComments
 
-                    let wrappedValue: WrappedValue
+                /// This comment is attached
+                /// to the case one.
+                public static let one = Self.init(wrappedValue: .one)
 
-                    private init(wrappedValue: WrappedValue) {
-                        self.wrappedValue = wrappedValue
-                    }
+                /**
+                 This comment is attached to the case two.
+                 */
+                public static let two = Self.init(wrappedValue: .two)
 
+                /// This should apply to both.
+                public static let three = Self.init(wrappedValue: .three)
 
-                    // This comment is attached
-                    // to the case one.
-                    public static let one = Self.init(wrappedValue: .one)
+                /// This should apply to both.
+                public static let four = Self.init(wrappedValue: .four)
+            }
+            """
 
-                    /*
-                     This comment is attached to the case two.
-                     */
-                    public static let two = Self.init(wrappedValue: .two)
+        assertMacroExpansion(
+            input,
+            expandedSource: expectedResult,
+            macroSpecs: testMacros,
+            failureHandler: Issue.record(failure:)
+        )
+    }
 
-                    // This should apply to both.
-                    public static let three = Self.init(wrappedValue: .three)
+    func attributesCarryOverToWrapper() {
+        let input = """
+            @PublicWrapper
+            @available(iOS 26, *)
+            @available(macOS 26, *)
+            enum SimpleEnum {
+                case value
+            }
+            """
+        let expectedResult = """
+            @available(iOS 26, *)
+            @available(macOS 26, *)
+            enum SimpleEnum {
+                case value
+            }
+            @available(iOS 26, *)
+            @available(macOS 26, *)
+            public struct SimpleEnumWrapper: Equatable, Hashable, Sendable {
+                typealias WrappedValue = SimpleEnum
 
-                    // This should apply to both.
-                    public static let four = Self.init(wrappedValue: .four)
-                }
-                """
-        case .withDocumentation:
-            input = """
-                /// This comment is attached to the enum.
-                @PublicWrapper
-                enum EnumWithDocumentation {
-                    /// This comment is attached
-                    /// to the case one.
-                    case one
+                let wrappedValue: WrappedValue
 
-                    /**
-                     This comment is attached to the case two.
-                     */
-                    case two
-
-                    /// This should apply to both.
-                    case three, four
-                }
-                """
-            expectedResult = """
-                /// This comment is attached to the enum.
-                enum EnumWithDocumentation {
-                    /// This comment is attached
-                    /// to the case one.
-                    case one
-
-                    /**
-                     This comment is attached to the case two.
-                     */
-                    case two
-
-                    /// This should apply to both.
-                    case three, four
+                private init(wrappedValue: WrappedValue) {
+                    self.wrappedValue = wrappedValue
                 }
 
-                /// This comment is attached to the enum.
-                public struct EnumWithDocumentationWrapper: Equatable, Hashable, Sendable {
-                    typealias WrappedValue = EnumWithDocumentation
+                public static let value = Self.init(wrappedValue: .value)
+            }
+            """
 
-                    let wrappedValue: WrappedValue
-
-                    private init(wrappedValue: WrappedValue) {
-                        self.wrappedValue = wrappedValue
-                    }
-
-
-                    /// This comment is attached
-                    /// to the case one.
-                    public static let one = Self.init(wrappedValue: .one)
-
-                    /**
-                     This comment is attached to the case two.
-                     */
-                    public static let two = Self.init(wrappedValue: .two)
-
-                    /// This should apply to both.
-                    public static let three = Self.init(wrappedValue: .three)
-
-                    /// This should apply to both.
-                    public static let four = Self.init(wrappedValue: .four)
-                }
-                """
-        }
-
-        return (input, expectedResult)
+        assertMacroExpansion(
+            input,
+            expandedSource: expectedResult,
+            macroSpecs: testMacros,
+            failureHandler: Issue.record(failure:)
+        )
     }
 }

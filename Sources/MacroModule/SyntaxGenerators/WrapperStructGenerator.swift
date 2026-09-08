@@ -36,6 +36,7 @@ enum WrapperStructGenerator {
         return DeclSyntax(
             StructDeclSyntax(
                 leadingTrivia: declaration.leadingTrivia,
+                attributes: filteredAttributes(declaration: declaration),
                 modifiers: DeclModifierListSyntax(arrayLiteral: .public),
                 name: structName(from: declaration),
                 inheritanceClause: inheritance.asInheritanceClauseSyntax,
@@ -51,5 +52,19 @@ enum WrapperStructGenerator {
 
     private static func structName(from declaration: EnumDeclSyntax) -> TokenSyntax {
         "\(declaration.name.trimmed)\(raw: wrapperNameSuffix)"
+    }
+
+    private static func filteredAttributes(declaration: EnumDeclSyntax) -> AttributeListSyntax {
+        declaration.attributes.trimmed
+            .filter { element in
+                switch element {
+                case let .attribute(syntax):
+                    // We need to filter out our own macro to avoid a loop build failure.
+                    (IdentifierTypeSyntax(syntax.attributeName)?.name.trimmed.text ?? "") != "PublicWrapper"
+                case .ifConfigDecl:
+                    true
+                }
+            }
+            .with(\.trailingTrivia, .newline)
     }
 }
