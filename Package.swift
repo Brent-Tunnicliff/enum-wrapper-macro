@@ -74,11 +74,32 @@ for target in package.targets where target.type != .plugin {
     // MARK: Swift compliler settings
 
     let commonSwiftSettings: [PackageDescription.SwiftSetting] = [
+        // <https://docs.swift.org/latest/documentation/diagnostics/strict-memory-safety/>
+        .strictMemorySafety(),
+
+        // Upcoming swift features.
+        // To see the list:
+        //  - Run `xcrun swiftc -print-supported-features` to see the list of them.
+        //  - Or visit <https://www.swift.org/swift-evolution/#?upcoming=true>
+        // Details of each can be found at <https://github.com/swiftlang/swift-evolution>.
+
+        // <https://github.com/swiftlang/swift-evolution/blob/main/proposals/0335-existential-any.md>
         .enableUpcomingFeature("ExistentialAny"),
-        .enableUpcomingFeature("InferIsolatedConformances"),
+
+        // <https://github.com/swiftlang/swift-evolution/blob/main/proposals/0409-access-level-on-imports.md>
         .enableUpcomingFeature("InternalImportsByDefault"),
+
+        // <https://github.com/swiftlang/swift-evolution/blob/main/proposals/0444-member-import-visibility.md>
         .enableUpcomingFeature("MemberImportVisibility"),
+
+        // <https://github.com/swiftlang/swift-evolution/blob/main/proposals/0470-isolated-conformances.md>
+        .enableUpcomingFeature("InferIsolatedConformances"),
+
+        // <https://github.com/swiftlang/swift-evolution/blob/main/proposals/0461-async-function-isolation.md>
         .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+
+        // <https://github.com/swiftlang/swift-evolution/blob/main/proposals/0481-weak-let.md>
+        .enableUpcomingFeature("ImmutableWeakCaptures"),
     ]
 
     target.swiftSettings = (target.swiftSettings ?? []) + commonSwiftSettings
